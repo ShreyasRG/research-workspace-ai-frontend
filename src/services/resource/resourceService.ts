@@ -1,6 +1,6 @@
-import type { Resource } from '../types';
-import { mockResources } from './mockData';
-import { delay } from './utils';
+import type { Resource, ResourceType } from '../../types';
+import { mockResources } from '../mockData';
+import { delay } from '../utils';
 
 export const resourceService = {
   async getResources(workspaceId?: string): Promise<Resource[]> {
@@ -18,7 +18,7 @@ export const resourceService = {
   async addResource(input: {
     workspaceId: string;
     title: string;
-    type: Resource['type'];
+    type: ResourceType;
     sourceUrl: string;
   }): Promise<Resource> {
     const newResource: Resource = {

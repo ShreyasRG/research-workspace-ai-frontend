@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ExternalLink, Calendar, User, Sparkles, KeyRound, Quote, HelpCircle, FileText, Video, StickyNote, Clock } from 'lucide-react';
-import { resourceService, aiService } from '../services';
+import { resourceService, summaryService } from '../services';
 import type { Resource, AISummary } from '../types';
 import { TagList } from '../components/ui/TagBadge';
 import { Skeleton } from '../components/ui/Skeleton';
 import { ErrorState } from '../components/ui/ErrorState';
-import { RESOURCE_TYPE_LABELS, RESOURCE_STATUS_LABELS, RESOURCE_STATUS_COLORS } from '../constants';
+import { RESOURCE_TYPE_LABELS, RESOURCE_STATUS_LABELS, RESOURCE_STATUS_COLORS, ROUTES } from '../constants';
 import { formatDate, formatDuration, formatRelative, cn } from '../utils';
 
 const TYPE_ICONS = { article: FileText, video: Video, note: StickyNote };
@@ -25,7 +25,7 @@ export function ResourceDetailPage() {
     setError(false);
     Promise.all([
       resourceService.getResource(id),
-      aiService.getSummaries().then((all) => all.find((s) => s.resourceId === id) ?? null),
+      summaryService.getSummaries().then((all) => all.find((s) => s.resourceId === id) ?? null),
     ]).then(([r, s]) => {
       if (!r) { setError(true); setLoading(false); return; }
       setResource(r);
@@ -46,7 +46,7 @@ export function ResourceDetailPage() {
       </div>
     );
   }
-  if (error || !resource) return <ErrorState onRetry={() => navigate('/search')} />;
+  if (error || !resource) return <ErrorState onRetry={() => navigate(ROUTES.SEARCH)} />;
 
   const Icon = TYPE_ICONS[resource.type];
 

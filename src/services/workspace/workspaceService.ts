@@ -1,6 +1,6 @@
-import type { Workspace } from '../types';
-import { mockWorkspaces } from './mockData';
-import { delay } from './utils';
+import type { Workspace } from '../../types';
+import { mockWorkspaces } from '../mockData';
+import { delay } from '../utils';
 
 export const workspaceService = {
   async getWorkspaces(): Promise<Workspace[]> {

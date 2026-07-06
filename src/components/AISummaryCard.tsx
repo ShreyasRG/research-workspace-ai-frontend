@@ -3,6 +3,7 @@ import { Sparkles, Calendar, ArrowRight, KeyRound, Quote, HelpCircle } from 'luc
 import type { AISummary } from '../types';
 import { TagList } from './ui/TagBadge';
 import { formatRelative } from '../utils';
+import { summaryPath } from '../constants';
 
 interface AISummaryCardProps {
   summary: AISummary;
@@ -12,7 +13,7 @@ interface AISummaryCardProps {
 export function AISummaryCard({ summary, compact = false }: AISummaryCardProps) {
   return (
     <Link
-      to={`/summaries/${summary.id}`}
+      to={summaryPath(summary.id)}
       className="card card-hover p-5 flex flex-col group animate-fade-in"
     >
       <div className="flex items-start gap-3 mb-3">

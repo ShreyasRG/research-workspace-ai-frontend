@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { FileText, Video, StickyNote, Clock, ExternalLink, BookOpen } from 'lucide-react';
 import type { Resource } from '../types';
 import { TagList } from './ui/TagBadge';
-import { RESOURCE_TYPE_LABELS, RESOURCE_STATUS_LABELS, RESOURCE_STATUS_COLORS } from '../constants';
+import { RESOURCE_TYPE_LABELS, RESOURCE_STATUS_LABELS, RESOURCE_STATUS_COLORS, resourcePath } from '../constants';
 import { formatRelative, formatDuration, cn } from '../utils';
 
 const TYPE_ICONS = {
@@ -39,7 +39,7 @@ export function ResourceCard({ resource }: ResourceCardProps) {
             </span>
           </div>
           <Link
-            to={`/resources/${resource.id}`}
+            to={resourcePath(resource.id)}
             className="text-sm font-semibold text-gray-900 dark:text-gray-100 hover:text-primary-600 dark:hover:text-primary-400 transition-colors line-clamp-2"
           >
             {resource.title}
@@ -79,7 +79,7 @@ export function ResourceCard({ resource }: ResourceCardProps) {
             </a>
           )}
           <Link
-            to={`/resources/${resource.id}`}
+            to={resourcePath(resource.id)}
             className="p-1.5 rounded-lg text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             aria-label="View resource"
           >

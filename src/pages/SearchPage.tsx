@@ -1,15 +1,13 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search as SearchIcon, SlidersHorizontal } from 'lucide-react';
-import { searchService, workspaceService } from '../services';
-import type { SearchResult, Workspace } from '../types';
 import { SearchBar } from '../components/ui/SearchBar';
 import { FilterGroup } from '../components/ui/Filters';
 import { CardGridSkeleton } from '../components/ui/Skeleton';
 import { EmptyState } from '../components/ui/EmptyState';
 import { TagList } from '../components/ui/TagBadge';
-import { useDebounce } from '../hooks/useDebounce';
-import { RESOURCE_TYPE_LABELS } from '../constants';
+import { useSearch } from '../hooks/useSearch';
+import { RESOURCE_TYPE_LABELS, resourcePath, summaryPath } from '../constants';
 import { formatRelative, cn } from '../utils';
 
 const TYPE_OPTIONS = [
@@ -21,43 +19,25 @@ const TYPE_OPTIONS = [
 
 export function SearchPage() {
   const navigate = useNavigate();
-  const [query, setQuery] = useState('');
-  const debouncedQuery = useDebounce(query, 350);
-  const [results, setResults] = useState<SearchResult[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
-  const [types, setTypes] = useState<string[]>([]);
-  const [workspaceFilter, setWorkspaceFilter] = useState<string[]>([]);
+  const {
+    query,
+    setQuery,
+    results,
+    loading,
+    types,
+    setTypes,
+    workspaceFilter,
+    setWorkspaceFilter,
+    activeFilterCount,
+    clearFilters,
+    workspaceOptions,
+  } = useSearch();
+
   const [showFilters, setShowFilters] = useState(false);
-
-  useEffect(() => {
-    workspaceService.getWorkspaces().then(setWorkspaces);
-  }, []);
-
-  useEffect(() => {
-    setLoading(true);
-    searchService
-      .searchResources(debouncedQuery, {
-        type: types.length ? types : undefined,
-        workspaceId: workspaceFilter[0],
-      })
-      .then((r) => {
-        setResults(r);
-        setLoading(false);
-      });
-  }, [debouncedQuery, types, workspaceFilter]);
 
   const toggle = (arr: string[], val: string, setter: (v: string[]) => void) => {
     setter(arr.includes(val) ? arr.filter((x) => x !== val) : [...arr, val]);
   };
-
-  const activeCount = types.length + workspaceFilter.length;
-  const clearAll = () => { setTypes([]); setWorkspaceFilter([]); };
-
-  const workspaceOptions = useMemo(
-    () => workspaces.map((w) => ({ label: w.title, value: w.id })),
-    [workspaces],
-  );
 
   return (
     <div className="space-y-6">
@@ -80,11 +60,11 @@ export function SearchPage() {
           onClick={() => setShowFilters((s) => !s)}
           className={cn(
             'btn-secondary lg:hidden',
-            activeCount > 0 && 'border-primary-300 text-primary-600 dark:text-primary-400',
+            activeFilterCount > 0 && 'border-primary-300 text-primary-600 dark:text-primary-400',
           )}
         >
           <SlidersHorizontal className="w-4 h-4" />
-          {activeCount > 0 && <span className="text-xs">{activeCount}</span>}
+          {activeFilterCount > 0 && <span className="text-xs">{activeFilterCount}</span>}
         </button>
       </div>
 
@@ -94,9 +74,9 @@ export function SearchPage() {
           <div className="card p-5 sticky top-20">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Filters</h3>
-              {activeCount > 0 && (
-                <button onClick={clearAll} className="text-xs font-medium text-primary-600 dark:text-primary-400 hover:underline">
-                  Clear all ({activeCount})
+              {activeFilterCount > 0 && (
+                <button onClick={clearFilters} className="text-xs font-medium text-primary-600 dark:text-primary-400 hover:underline">
+                  Clear all ({activeFilterCount})
                 </button>
               )}
             </div>
@@ -124,7 +104,7 @@ export function SearchPage() {
                 {results.map((r) => (
                   <button
                     key={`${r.type}-${r.id}`}
-                    onClick={() => navigate(r.type === 'summary' ? `/summaries/${r.id}` : `/resources/${r.id}`)}
+                    onClick={() => navigate(r.type === 'summary' ? summaryPath(r.id) : resourcePath(r.id))}
                     className="card card-hover p-4 w-full text-left flex items-start gap-4 group animate-fade-in"
                   >
                     <div className={cn(

@@ -1,5 +1,6 @@
-export { authService } from './authService';
-export { workspaceService } from './workspaceService';
-export { resourceService } from './resourceService';
-export { aiService, searchService } from './searchService';
-export { profileService } from './profileService';
+export { authService } from './auth';
+export { workspaceService } from './workspace';
+export { resourceService } from './resource';
+export { searchService } from './search';
+export { summaryService } from './summary';
+export { profileService } from './profile';

@@ -1,27 +1,9 @@
-import type { AISummary, SearchResult } from '../types';
-import { mockResources, mockSummaries, mockWorkspaces } from './mockData';
-import { delay } from './utils';
-
-export const aiService = {
-  async getSummaries(workspaceId?: string): Promise<AISummary[]> {
-    const items = workspaceId
-      ? mockSummaries.filter((s) => s.workspaceId === workspaceId)
-      : mockSummaries;
-    return delay(items);
-  },
-
-  async getSummary(id: string): Promise<AISummary | null> {
-    const s = mockSummaries.find((x) => x.id === id) ?? null;
-    return delay(s);
-  },
-};
+import type { SearchResult, SearchFilters } from '../../types';
+import { mockResources, mockSummaries, mockWorkspaces } from '../mockData';
+import { delay } from '../utils';
 
 export const searchService = {
-  async searchResources(query: string, filters?: {
-    type?: string[];
-    workspaceId?: string;
-    tag?: string;
-  }): Promise<SearchResult[]> {
+  async searchResources(query: string, filters?: SearchFilters): Promise<SearchResult[]> {
     const q = query.trim().toLowerCase();
     const results: SearchResult[] = [];
 

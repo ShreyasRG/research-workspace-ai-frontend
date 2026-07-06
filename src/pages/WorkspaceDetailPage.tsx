@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, Calendar, User, Users, FileText, Video, StickyNote, Sparkles, Trash2, ExternalLink } from 'lucide-react';
-import { workspaceService, resourceService, aiService } from '../services';
+import { workspaceService, resourceService, summaryService } from '../services';
 import type { Workspace, Resource, AISummary, ResourceType } from '../types';
 import { ResourceCard } from '../components/ResourceCard';
 import { AISummaryCard } from '../components/AISummaryCard';
@@ -13,6 +13,7 @@ import { Modal } from '../components/ui/Modal';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 import { useToast } from '../contexts/ToastContext';
 import { formatDate, cn } from '../utils';
+import { ROUTES } from '../constants';
 
 const TABS: { id: string; label: string; icon: typeof FileText }[] = [
   { id: 'articles', label: 'Articles', icon: FileText },
@@ -43,7 +44,7 @@ export function WorkspaceDetailPage() {
     Promise.all([
       workspaceService.getWorkspace(id),
       resourceService.getResources(id),
-      aiService.getSummaries(id),
+      summaryService.getSummaries(id),
     ]).then(([ws, res, sum]) => {
       if (!ws) { setError(true); setLoading(false); return; }
       setWorkspace(ws);
@@ -81,7 +82,7 @@ export function WorkspaceDetailPage() {
   };
 
   if (loading) return <div className="space-y-6"><CardGridSkeleton count={4} /></div>;
-  if (error || !workspace) return <ErrorState onRetry={() => navigate('/workspaces')} />;
+  if (error || !workspace) return <ErrorState onRetry={() => navigate(ROUTES.WORKSPACES)} />;
 
   const filteredResources = resources.filter((r) => {
     if (activeTab === 'articles') return r.type === 'article';
@@ -92,7 +93,7 @@ export function WorkspaceDetailPage() {
 
   return (
     <div className="space-y-6">
-      <button onClick={() => navigate('/workspaces')} className="btn-ghost -ml-3">
+      <button onClick={() => navigate(ROUTES.WORKSPACES)} className="btn-ghost -ml-3">
         <ArrowLeft className="w-4 h-4" />
         Back to workspaces
       </button>

@@ -1,6 +1,14 @@
-import type { AuthResponse, User } from '../types';
-import { mockUser } from './mockData';
-import { delay } from './utils';
+import type { User, AuthResponse } from '../../types';
+import { delay } from '../utils';
+
+const mockUser: User = {
+  id: 'u1',
+  name: 'Alex Morgan',
+  email: 'alex.morgan@research.io',
+  avatarUrl: 'https://images.pexels.com/photos/220817/pexels-photo-220817.jpeg?auto=compress&cs=tinysrgb&w=200',
+  role: 'owner',
+  joinedDate: '2024-01-15T08:00:00Z',
+};
 
 const MOCK_TOKEN = 'mock-jwt-token';
 const MOCK_REFRESH = 'mock-refresh-token';

@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import type { User } from '../types';
 import { authService } from '../services';
 import { STORAGE_KEYS } from '../constants';
+import { getItem, setItem, removeItem } from '../utils/storage';
 
 interface AuthContextValue {
   user: User | null;
@@ -22,22 +23,13 @@ interface StoredAuth {
   token: string;
 }
 
-function loadStoredAuth(): StoredAuth | null {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEYS.auth);
-    return raw ? (JSON.parse(raw) as StoredAuth) : null;
-  } catch {
-    return null;
-  }
-}
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const stored = loadStoredAuth();
+    const stored = getItem<StoredAuth>(STORAGE_KEYS.auth);
     if (stored) {
       setUser(stored.user);
       setToken(stored.token);
@@ -46,13 +38,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const persist = useCallback((u: User, t: string) => {
-    localStorage.setItem(STORAGE_KEYS.auth, JSON.stringify({ user: u, token: t }));
+    setItem<StoredAuth>(STORAGE_KEYS.auth, { user: u, token: t });
     setUser(u);
     setToken(t);
   }, []);
 
   const clear = useCallback(() => {
-    localStorage.removeItem(STORAGE_KEYS.auth);
+    removeItem(STORAGE_KEYS.auth);
     setUser(null);
     setToken(null);
   }, []);

@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 import { CheckCircle2, AlertCircle, Info, XCircle, X } from 'lucide-react';
+import { TOAST_DURATION } from '../constants';
 
 type ToastType = 'success' | 'error' | 'info' | 'warning';
 
@@ -42,7 +43,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const show = useCallback((toast: Omit<Toast, 'id'>) => {
     const id = `toast-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
     setToasts((t) => [...t, { ...toast, id }]);
-    setTimeout(() => dismiss(id), 4000);
+    setTimeout(() => dismiss(id), TOAST_DURATION.DEFAULT);
   }, [dismiss]);
 
   const value = useMemo(() => ({ toasts, show, dismiss }), [toasts, show, dismiss]);

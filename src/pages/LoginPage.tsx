@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Brain, Mail, Lock, Eye, EyeOff, ArrowRight, Sparkles } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
+import { ROUTES } from '../constants';
 
 export function LoginPage() {
   const { login, loginWithGoogle, loginWithGithub, loginAsDemo } = useAuth();
@@ -20,7 +21,7 @@ export function LoginPage() {
     try {
       await login(email, password);
       show({ type: 'success', title: 'Welcome back!', message: 'You are now signed in.' });
-      navigate('/dashboard');
+      navigate(ROUTES.DASHBOARD);
     } catch {
       show({ type: 'error', title: 'Sign in failed', message: 'Please check your credentials.' });
     } finally {
@@ -34,7 +35,7 @@ export function LoginPage() {
       if (provider === 'google') await loginWithGoogle();
       else await loginWithGithub();
       show({ type: 'success', title: `Signed in with ${provider === 'google' ? 'Google' : 'GitHub'}` });
-      navigate('/dashboard');
+      navigate(ROUTES.DASHBOARD);
     } catch {
       show({ type: 'error', title: 'Authentication failed' });
     } finally {
@@ -47,7 +48,7 @@ export function LoginPage() {
     try {
       await loginAsDemo();
       show({ type: 'success', title: 'Demo mode active', message: 'Explore the workspace with sample data.' });
-      navigate('/dashboard');
+      navigate(ROUTES.DASHBOARD);
     } finally {
       setLoading(null);
     }

@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Sparkles, KeyRound, Quote, HelpCircle, Calendar, FolderKanban } from 'lucide-react';
-import { aiService } from '../services';
+import { summaryService } from '../services';
 import type { AISummary } from '../types';
 import { TagList } from '../components/ui/TagBadge';
 import { Skeleton } from '../components/ui/Skeleton';
 import { ErrorState } from '../components/ui/ErrorState';
 import { formatRelative } from '../utils';
+import { ROUTES, workspacePath } from '../constants';
 
 export function SummaryDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -19,7 +20,7 @@ export function SummaryDetailPage() {
     if (!id) return;
     setLoading(true);
     setError(false);
-    aiService.getSummary(id).then((s) => {
+    summaryService.getSummary(id).then((s) => {
       if (!s) { setError(true); setLoading(false); return; }
       setSummary(s);
       setLoading(false);
@@ -37,7 +38,7 @@ export function SummaryDetailPage() {
       </div>
     );
   }
-  if (error || !summary) return <ErrorState onRetry={() => navigate('/summaries')} />;
+  if (error || !summary) return <ErrorState onRetry={() => navigate(ROUTES.SUMMARIES)} />;
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -55,7 +56,7 @@ export function SummaryDetailPage() {
             <div className="flex-1 min-w-0">
               <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{summary.title}</h1>
               <div className="flex flex-wrap items-center gap-4 mt-2 text-xs text-gray-500 dark:text-gray-400">
-                <Link to={`/workspaces/${summary.workspaceId}`} className="flex items-center gap-1.5 hover:text-primary-600 dark:hover:text-primary-400">
+                <Link to={workspacePath(summary.workspaceId)} className="flex items-center gap-1.5 hover:text-primary-600 dark:hover:text-primary-400">
                   <FolderKanban className="w-3.5 h-3.5" /> {summary.workspaceName}
                 </Link>
                 <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> {formatRelative(summary.generatedDate)}</span>

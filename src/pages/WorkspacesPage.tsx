@@ -8,6 +8,7 @@ import { CardGridSkeleton } from '../components/ui/Skeleton';
 import { EmptyState } from '../components/ui/EmptyState';
 import { Modal } from '../components/ui/Modal';
 import { useToast } from '../contexts/ToastContext';
+import { workspacePath } from '../constants';
 
 export function WorkspacesPage() {
   const { show } = useToast();
@@ -35,7 +36,7 @@ export function WorkspacesPage() {
       setCreateOpen(false);
       setNewTitle('');
       setNewDesc('');
-      navigate(`/workspaces/${ws.id}`);
+      navigate(workspacePath(ws.id));
     } finally {
       setCreating(false);
     }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Sparkles } from 'lucide-react';
-import { aiService } from '../services';
+import { summaryService } from '../services';
 import type { AISummary } from '../types';
 import { AISummaryCard } from '../components/AISummaryCard';
 import { CardGridSkeleton } from '../components/ui/Skeleton';
@@ -11,7 +11,7 @@ export function SummariesPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    aiService.getSummaries().then((s) => {
+    summaryService.getSummaries().then((s) => {
       setSummaries(s);
       setLoading(false);
     });

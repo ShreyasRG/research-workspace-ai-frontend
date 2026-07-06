@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { STORAGE_KEYS } from '../constants';
-
-type Theme = 'light' | 'dark';
+import { getItem, setItem } from '../utils/storage';
+import type { Theme } from '../types';
 
 interface ThemeContextValue {
   theme: Theme;
@@ -12,7 +12,7 @@ interface ThemeContextValue {
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 function getInitialTheme(): Theme {
-  const stored = localStorage.getItem(STORAGE_KEYS.theme);
+  const stored = getItem<string>(STORAGE_KEYS.theme);
   if (stored === 'light' || stored === 'dark') return stored;
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
@@ -24,7 +24,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const root = document.documentElement;
     if (theme === 'dark') root.classList.add('dark');
     else root.classList.remove('dark');
-    localStorage.setItem(STORAGE_KEYS.theme, theme);
+    setItem(STORAGE_KEYS.theme, theme);
   }, [theme]);
 
   const setTheme = useCallback((t: Theme) => setThemeState(t), []);

@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import { STORAGE_KEYS } from '../constants';
+import { getItem, setItem } from '../utils/storage';
 
 export function useSidebarCollapsed(): [boolean, (v: boolean) => void] {
   const [collapsed, setCollapsed] = useState<boolean>(() => {
-    return localStorage.getItem(STORAGE_KEYS.sidebar) === 'true';
+    return getItem<boolean>(STORAGE_KEYS.sidebar) === true;
   });
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.sidebar, String(collapsed));
+    setItem(STORAGE_KEYS.sidebar, collapsed);
   }, [collapsed]);
 
   return [collapsed, setCollapsed];

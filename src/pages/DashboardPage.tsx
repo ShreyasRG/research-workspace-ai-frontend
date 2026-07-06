@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Plus, FolderKanban, Sparkles, ArrowRight, FileText, Video } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { workspaceService, resourceService, aiService } from '../services';
+import { workspaceService, resourceService, summaryService } from '../services';
 import type { Workspace, Resource, AISummary } from '../types';
 import { WorkspaceCard } from '../components/WorkspaceCard';
 import { ResourceCard } from '../components/ResourceCard';
@@ -11,6 +11,7 @@ import { CardGridSkeleton } from '../components/ui/Skeleton';
 import { Modal } from '../components/ui/Modal';
 import { useToast } from '../contexts/ToastContext';
 import { formatRelative, cn } from '../utils';
+import { ROUTES, workspacePath } from '../constants';
 
 export function DashboardPage() {
   const { user } = useAuth();
@@ -29,7 +30,7 @@ export function DashboardPage() {
     Promise.all([
       workspaceService.getWorkspaces(),
       resourceService.getResources(),
-      aiService.getSummaries(),
+      summaryService.getSummaries(),
     ]).then(([ws, res, sum]) => {
       setWorkspaces(ws);
       setResources(res);
@@ -47,7 +48,7 @@ export function DashboardPage() {
       setCreateOpen(false);
       setNewTitle('');
       setNewDesc('');
-      navigate(`/workspaces/${ws.id}`);
+      navigate(workspacePath(ws.id));
     } finally {
       setCreating(false);
     }
@@ -105,7 +106,7 @@ export function DashboardPage() {
       <section>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Recent Workspaces</h2>
-          <Link to="/workspaces" className="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline flex items-center gap-1">
+          <Link to={ROUTES.WORKSPACES} className="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline flex items-center gap-1">
             View all <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
@@ -125,7 +126,7 @@ export function DashboardPage() {
         <section>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Recently Added Resources</h2>
-            <Link to="/search" className="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline flex items-center gap-1">
+            <Link to={ROUTES.SEARCH} className="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline flex items-center gap-1">
               Browse <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -144,7 +145,7 @@ export function DashboardPage() {
         <section>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Recent AI Summaries</h2>
-            <Link to="/summaries" className="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline flex items-center gap-1">
+            <Link to={ROUTES.SUMMARIES} className="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline flex items-center gap-1">
               View all <ArrowRight className="w-4 h-4" />
             </Link>
           </div>

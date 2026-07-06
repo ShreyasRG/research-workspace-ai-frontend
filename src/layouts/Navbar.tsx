@@ -7,6 +7,7 @@ import { Avatar } from '../components/ui/Avatar';
 import { profileService } from '../services';
 import type { Notification } from '../types';
 import { formatRelative, cn } from '../utils';
+import { ROUTES } from '../constants';
 
 interface NavbarProps {
   onMobileMenu: () => void;
@@ -52,7 +53,7 @@ export function Navbar({ onMobileMenu }: NavbarProps) {
       </button>
 
       <button
-        onClick={() => navigate('/search')}
+        onClick={() => navigate(ROUTES.SEARCH)}
         className="hidden md:flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors w-64"
       >
         <Search className="w-4 h-4" />
@@ -63,7 +64,7 @@ export function Navbar({ onMobileMenu }: NavbarProps) {
       </button>
 
       <button
-        onClick={() => navigate('/search')}
+        onClick={() => navigate(ROUTES.SEARCH)}
         className="md:hidden btn-ghost p-2"
         aria-label="Search"
       >
@@ -143,14 +144,14 @@ export function Navbar({ onMobileMenu }: NavbarProps) {
               </div>
               <div className="py-1">
                 <button
-                  onClick={() => { setUserOpen(false); navigate('/profile'); }}
+                  onClick={() => { setUserOpen(false); navigate(ROUTES.PROFILE); }}
                   className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                 >
                   <UserCircle className="w-4 h-4" />
                   Profile
                 </button>
                 <button
-                  onClick={() => { setUserOpen(false); navigate('/profile'); }}
+                  onClick={() => { setUserOpen(false); navigate(ROUTES.PROFILE); }}
                   className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                 >
                   <Settings className="w-4 h-4" />

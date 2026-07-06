@@ -1,6 +1,6 @@
-import type { Notification, Profile } from '../types';
-import { mockNotifications, mockProfile } from './mockData';
-import { delay } from './utils';
+import type { Profile, Notification } from '../../types';
+import { mockNotifications, mockProfile } from '../mockData';
+import { delay } from '../utils';
 
 export const profileService = {
   async getProfile(): Promise<Profile> {

@@ -3,6 +3,7 @@ import { FolderKanban, Server, Target, BrainCircuit, ShieldCheck, Users, Calenda
 import type { Workspace } from '../types';
 import { Avatar } from './ui/Avatar';
 import { formatDate } from '../utils';
+import { workspacePath } from '../constants';
 import { cn } from '../utils';
 
 const ICONS: Record<string, typeof FolderKanban> = {
@@ -21,7 +22,7 @@ export function WorkspaceCard({ workspace }: WorkspaceCardProps) {
   const Icon = ICONS[workspace.icon] ?? FolderKanban;
   return (
     <Link
-      to={`/workspaces/${workspace.id}`}
+      to={workspacePath(workspace.id)}
       className="card card-hover p-5 flex flex-col group animate-fade-in"
     >
       <div className="flex items-start justify-between mb-4">
