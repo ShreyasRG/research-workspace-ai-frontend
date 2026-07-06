@@ -1,8 +1,6 @@
-import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ExternalLink, Calendar, User, Sparkles, KeyRound, Quote, HelpCircle, FileText, Video, StickyNote, Clock } from 'lucide-react';
-import { resourceService, summaryService } from '../services';
-import type { Resource, AISummary } from '../types';
+import { useResource, useSummaries } from '../hooks/queries';
 import { TagList } from '../components/ui/TagBadge';
 import { Skeleton } from '../components/ui/Skeleton';
 import { ErrorState } from '../components/ui/ErrorState';
@@ -14,25 +12,11 @@ const TYPE_ICONS = { article: FileText, video: Video, note: StickyNote };
 export function ResourceDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [resource, setResource] = useState<Resource | null>(null);
-  const [summary, setSummary] = useState<AISummary | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-
-  useEffect(() => {
-    if (!id) return;
-    setLoading(true);
-    setError(false);
-    Promise.all([
-      resourceService.getResource(id),
-      summaryService.getSummaries().then((all) => all.find((s) => s.resourceId === id) ?? null),
-    ]).then(([r, s]) => {
-      if (!r) { setError(true); setLoading(false); return; }
-      setResource(r);
-      setSummary(s);
-      setLoading(false);
-    });
-  }, [id]);
+  const { data: resource, isLoading, error } = useResource(id);
+  const { data: allSummaries = [] } = useSummaries();
+  const summary = allSummaries.find((s) => s.resourceId === id) ?? null;
+  const loading = isLoading;
+  const errorState = !!error || (!isLoading && !resource);
 
   if (loading) {
     return (
@@ -46,7 +30,7 @@ export function ResourceDetailPage() {
       </div>
     );
   }
-  if (error || !resource) return <ErrorState onRetry={() => navigate(ROUTES.SEARCH)} />;
+  if (errorState || !resource) return <ErrorState onRetry={() => navigate(ROUTES.SEARCH)} />;
 
   const Icon = TYPE_ICONS[resource.type];
 

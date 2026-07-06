@@ -1,21 +1,11 @@
-import { useEffect, useState } from 'react';
 import { Sparkles } from 'lucide-react';
-import { summaryService } from '../services';
-import type { AISummary } from '../types';
+import { useSummaries } from '../hooks/queries';
 import { AISummaryCard } from '../components/AISummaryCard';
 import { CardGridSkeleton } from '../components/ui/Skeleton';
 import { EmptyState } from '../components/ui/EmptyState';
 
 export function SummariesPage() {
-  const [summaries, setSummaries] = useState<AISummary[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    summaryService.getSummaries().then((s) => {
-      setSummaries(s);
-      setLoading(false);
-    });
-  }, []);
+  const { data: summaries = [], isLoading } = useSummaries();
 
   return (
     <div className="space-y-6">
@@ -26,7 +16,7 @@ export function SummariesPage() {
         </p>
       </div>
 
-      {loading ? (
+      {isLoading ? (
         <CardGridSkeleton count={6} />
       ) : summaries.length === 0 ? (
         <EmptyState

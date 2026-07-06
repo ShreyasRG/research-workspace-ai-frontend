@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Mail, Calendar, FolderKanban, FileText, Sparkles, Bell, MailOpen, Zap, Cpu, Moon, Sun } from 'lucide-react';
-import { profileService } from '../services';
+import { useProfile } from '../hooks/queries';
 import type { Profile } from '../types';
 import { Avatar } from '../components/ui/Avatar';
 import { Skeleton } from '../components/ui/Skeleton';
@@ -9,19 +9,14 @@ import { formatDate, cn } from '../utils';
 
 export function ProfilePage() {
   const { theme, setTheme } = useTheme();
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: profile, isLoading } = useProfile();
   const [prefs, setPrefs] = useState<Profile['preferences'] | null>(null);
 
   useEffect(() => {
-    profileService.getProfile().then((p) => {
-      setProfile(p);
-      setPrefs(p.preferences);
-      setLoading(false);
-    });
-  }, []);
+    if (profile) setPrefs(profile.preferences);
+  }, [profile]);
 
-  if (loading || !profile || !prefs) {
+  if (isLoading || !profile || !prefs) {
     return (
       <div className="max-w-3xl mx-auto space-y-6">
         <Skeleton className="h-40 w-full" />

@@ -1,4 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { queryClient } from './lib/query/queryClient';
 import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { ToastProvider } from './contexts/ToastContext';
@@ -19,10 +21,11 @@ import { ProfilePage } from './pages/ProfilePage';
 export default function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider>
-        <AuthProvider>
-          <ToastProvider>
-            <BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <AuthProvider>
+            <ToastProvider>
+              <BrowserRouter>
               <Routes>
                 <Route path={ROUTES.LOGIN} element={<LoginPage />} />
                 <Route
@@ -121,6 +124,7 @@ export default function App() {
           </ToastProvider>
         </AuthProvider>
       </ThemeProvider>
+      </QueryClientProvider>
     </ErrorBoundary>
   );
 }

@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Plus, FolderKanban, Sparkles, ArrowRight, FileText, Video } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { workspaceService, resourceService, summaryService } from '../services';
-import type { Workspace, Resource, AISummary } from '../types';
+import { useDashboard } from '../hooks/queries';
+import { useCreateWorkspace } from '../hooks/mutations';
 import { WorkspaceCard } from '../components/WorkspaceCard';
 import { ResourceCard } from '../components/ResourceCard';
 import { AISummaryCard } from '../components/AISummaryCard';
@@ -17,41 +17,23 @@ export function DashboardPage() {
   const { user } = useAuth();
   const { show } = useToast();
   const navigate = useNavigate();
-  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
-  const [resources, setResources] = useState<Resource[]>([]);
-  const [summaries, setSummaries] = useState<AISummary[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: dashboardData, isLoading } = useDashboard();
+  const workspaces = dashboardData?.workspaces ?? [];
+  const resources = dashboardData?.resources ?? [];
+  const summaries = dashboardData?.summaries ?? [];
+  const createWorkspace = useCreateWorkspace();
   const [createOpen, setCreateOpen] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [newDesc, setNewDesc] = useState('');
-  const [creating, setCreating] = useState(false);
-
-  useEffect(() => {
-    Promise.all([
-      workspaceService.getWorkspaces(),
-      resourceService.getResources(),
-      summaryService.getSummaries(),
-    ]).then(([ws, res, sum]) => {
-      setWorkspaces(ws);
-      setResources(res);
-      setSummaries(sum);
-      setLoading(false);
-    });
-  }, []);
 
   const handleCreate = async () => {
     if (!newTitle.trim()) return;
-    setCreating(true);
-    try {
-      const ws = await workspaceService.createWorkspace({ title: newTitle, description: newDesc });
-      show({ type: 'success', title: 'Workspace created', message: ws.title });
-      setCreateOpen(false);
-      setNewTitle('');
-      setNewDesc('');
-      navigate(workspacePath(ws.id));
-    } finally {
-      setCreating(false);
-    }
+    const ws = await createWorkspace.mutateAsync({ title: newTitle, description: newDesc });
+    show({ type: 'success', title: 'Workspace created', message: ws.title });
+    setCreateOpen(false);
+    setNewTitle('');
+    setNewDesc('');
+    navigate(workspacePath(ws.id));
   };
 
   const stats = [
@@ -110,7 +92,7 @@ export function DashboardPage() {
             View all <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
-        {loading ? (
+        {isLoading ? (
           <CardGridSkeleton count={3} />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -130,7 +112,7 @@ export function DashboardPage() {
               Browse <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
-          {loading ? (
+          {isLoading ? (
             <CardGridSkeleton count={2} />
           ) : (
             <div className="space-y-4">
@@ -149,7 +131,7 @@ export function DashboardPage() {
               View all <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
-          {loading ? (
+          {isLoading ? (
             <CardGridSkeleton count={2} />
           ) : (
             <div className="space-y-4">
@@ -169,8 +151,8 @@ export function DashboardPage() {
         footer={
           <>
             <button className="btn-secondary" onClick={() => setCreateOpen(false)}>Cancel</button>
-            <button className="btn-primary" onClick={handleCreate} disabled={creating || !newTitle.trim()}>
-              {creating ? 'Creating…' : 'Create workspace'}
+            <button className="btn-primary" onClick={handleCreate} disabled={createWorkspace.isPending || !newTitle.trim()}>
+              {createWorkspace.isPending ? 'Creating…' : 'Create workspace'}
             </button>
           </>
         }

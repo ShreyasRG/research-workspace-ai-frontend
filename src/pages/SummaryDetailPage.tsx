@@ -1,8 +1,6 @@
-import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Sparkles, KeyRound, Quote, HelpCircle, Calendar, FolderKanban } from 'lucide-react';
-import { summaryService } from '../services';
-import type { AISummary } from '../types';
+import { useSummary } from '../hooks/queries';
 import { TagList } from '../components/ui/TagBadge';
 import { Skeleton } from '../components/ui/Skeleton';
 import { ErrorState } from '../components/ui/ErrorState';
@@ -12,22 +10,10 @@ import { ROUTES, workspacePath } from '../constants';
 export function SummaryDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [summary, setSummary] = useState<AISummary | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const { data: summary, isLoading, error } = useSummary(id);
+  const errorState = !!error || (!isLoading && !summary);
 
-  useEffect(() => {
-    if (!id) return;
-    setLoading(true);
-    setError(false);
-    summaryService.getSummary(id).then((s) => {
-      if (!s) { setError(true); setLoading(false); return; }
-      setSummary(s);
-      setLoading(false);
-    });
-  }, [id]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="max-w-4xl mx-auto space-y-6">
         <Skeleton className="h-6 w-32" />
@@ -38,7 +24,7 @@ export function SummaryDetailPage() {
       </div>
     );
   }
-  if (error || !summary) return <ErrorState onRetry={() => navigate(ROUTES.SUMMARIES)} />;
+  if (errorState || !summary) return <ErrorState onRetry={() => navigate(ROUTES.SUMMARIES)} />;
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">

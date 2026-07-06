@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, FolderKanban } from 'lucide-react';
-import { workspaceService } from '../services';
-import type { Workspace } from '../types';
+import { useWorkspaces } from '../hooks/queries';
+import { useCreateWorkspace } from '../hooks/mutations';
 import { WorkspaceCard } from '../components/WorkspaceCard';
 import { CardGridSkeleton } from '../components/ui/Skeleton';
 import { EmptyState } from '../components/ui/EmptyState';
@@ -13,33 +13,20 @@ import { workspacePath } from '../constants';
 export function WorkspacesPage() {
   const { show } = useToast();
   const navigate = useNavigate();
-  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: workspaces = [], isLoading } = useWorkspaces();
+  const createWorkspace = useCreateWorkspace();
   const [createOpen, setCreateOpen] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [newDesc, setNewDesc] = useState('');
-  const [creating, setCreating] = useState(false);
-
-  useEffect(() => {
-    workspaceService.getWorkspaces().then((ws) => {
-      setWorkspaces(ws);
-      setLoading(false);
-    });
-  }, []);
 
   const handleCreate = async () => {
     if (!newTitle.trim()) return;
-    setCreating(true);
-    try {
-      const ws = await workspaceService.createWorkspace({ title: newTitle, description: newDesc });
-      show({ type: 'success', title: 'Workspace created', message: ws.title });
-      setCreateOpen(false);
-      setNewTitle('');
-      setNewDesc('');
-      navigate(workspacePath(ws.id));
-    } finally {
-      setCreating(false);
-    }
+    const ws = await createWorkspace.mutateAsync({ title: newTitle, description: newDesc });
+    show({ type: 'success', title: 'Workspace created', message: ws.title });
+    setCreateOpen(false);
+    setNewTitle('');
+    setNewDesc('');
+    navigate(workspacePath(ws.id));
   };
 
   return (
@@ -57,7 +44,7 @@ export function WorkspacesPage() {
         </button>
       </div>
 
-      {loading ? (
+      {isLoading ? (
         <CardGridSkeleton count={6} />
       ) : workspaces.length === 0 ? (
         <EmptyState
@@ -87,8 +74,8 @@ export function WorkspacesPage() {
         footer={
           <>
             <button className="btn-secondary" onClick={() => setCreateOpen(false)}>Cancel</button>
-            <button className="btn-primary" onClick={handleCreate} disabled={creating || !newTitle.trim()}>
-              {creating ? 'Creating…' : 'Create workspace'}
+            <button className="btn-primary" onClick={handleCreate} disabled={createWorkspace.isPending || !newTitle.trim()}>
+              {createWorkspace.isPending ? 'Creating…' : 'Create workspace'}
             </button>
           </>
         }

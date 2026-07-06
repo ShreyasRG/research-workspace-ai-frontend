@@ -6,7 +6,7 @@ import { FilterGroup } from '../components/ui/Filters';
 import { CardGridSkeleton } from '../components/ui/Skeleton';
 import { EmptyState } from '../components/ui/EmptyState';
 import { TagList } from '../components/ui/TagBadge';
-import { useSearch } from '../hooks/useSearch';
+import { useSearch, useSearchWorkspaces } from '../hooks/queries';
 import { RESOURCE_TYPE_LABELS, resourcePath, summaryPath } from '../constants';
 import { formatRelative, cn } from '../utils';
 
@@ -19,21 +19,23 @@ const TYPE_OPTIONS = [
 
 export function SearchPage() {
   const navigate = useNavigate();
-  const {
-    query,
-    setQuery,
-    results,
-    loading,
-    types,
-    setTypes,
-    workspaceFilter,
-    setWorkspaceFilter,
-    activeFilterCount,
-    clearFilters,
-    workspaceOptions,
-  } = useSearch();
-
+  const [query, setQuery] = useState('');
+  const [types, setTypes] = useState<string[]>([]);
+  const [workspaceFilter, setWorkspaceFilter] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
+
+  const filters = {
+    type: types.length ? types : undefined,
+    workspaceId: workspaceFilter[0],
+  };
+  const { data: results = [], isLoading: loading } = useSearch(query, filters);
+  const { data: workspaces = [] } = useSearchWorkspaces();
+  const workspaceOptions = workspaces.map((w) => ({ label: w.title, value: w.id }));
+  const activeFilterCount = types.length + workspaceFilter.length;
+  const clearFilters = () => {
+    setTypes([]);
+    setWorkspaceFilter([]);
+  };
 
   const toggle = (arr: string[], val: string, setter: (v: string[]) => void) => {
     setter(arr.includes(val) ? arr.filter((x) => x !== val) : [...arr, val]);

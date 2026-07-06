@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, Calendar, User, Users, FileText, Video, StickyNote, Sparkles, Trash2, ExternalLink } from 'lucide-react';
-import { workspaceService, resourceService, summaryService } from '../services';
-import type { Workspace, Resource, AISummary, ResourceType } from '../types';
+import { useWorkspace, useResources, useSummaries } from '../hooks/queries';
+import { useAddResource, useDeleteResource } from '../hooks/mutations';
+import type { Resource, ResourceType } from '../types';
 import { ResourceCard } from '../components/ResourceCard';
 import { AISummaryCard } from '../components/AISummaryCard';
 import { Avatar } from '../components/ui/Avatar';
@@ -26,43 +27,26 @@ export function WorkspaceDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { show } = useToast();
-  const [workspace, setWorkspace] = useState<Workspace | null>(null);
-  const [resources, setResources] = useState<Resource[]>([]);
-  const [summaries, setSummaries] = useState<AISummary[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const { data: workspace, isLoading: wsLoading, error: wsError } = useWorkspace(id);
+  const { data: resources = [], isLoading: resLoading } = useResources(id);
+  const { data: summaries = [], isLoading: sumLoading } = useSummaries(id);
+  const loading = wsLoading || resLoading || sumLoading;
+  const error = !!wsError || (!wsLoading && !workspace);
+  const addResource = useAddResource();
+  const deleteResource = useDeleteResource();
   const [activeTab, setActiveTab] = useState('articles');
   const [addOpen, setAddOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Resource | null>(null);
-  const [deleting, setDeleting] = useState(false);
   const [newRes, setNewRes] = useState({ title: '', type: 'article' as ResourceType, sourceUrl: '' });
-
-  useEffect(() => {
-    if (!id) return;
-    setLoading(true);
-    setError(false);
-    Promise.all([
-      workspaceService.getWorkspace(id),
-      resourceService.getResources(id),
-      summaryService.getSummaries(id),
-    ]).then(([ws, res, sum]) => {
-      if (!ws) { setError(true); setLoading(false); return; }
-      setWorkspace(ws);
-      setResources(res);
-      setSummaries(sum);
-      setLoading(false);
-    });
-  }, [id]);
 
   const handleAdd = async () => {
     if (!newRes.title.trim() || !id) return;
-    const r = await resourceService.addResource({
+    const r = await addResource.mutateAsync({
       workspaceId: id,
       title: newRes.title,
       type: newRes.type,
       sourceUrl: newRes.sourceUrl,
     });
-    setResources((prev) => [r, ...prev]);
     show({ type: 'success', title: 'Resource added', message: r.title });
     setAddOpen(false);
     setNewRes({ title: '', type: 'article', sourceUrl: '' });
@@ -70,15 +54,9 @@ export function WorkspaceDetailPage() {
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
-    setDeleting(true);
-    try {
-      await resourceService.deleteResource(deleteTarget.id);
-      setResources((prev) => prev.filter((r) => r.id !== deleteTarget.id));
-      show({ type: 'success', title: 'Resource deleted' });
-      setDeleteTarget(null);
-    } finally {
-      setDeleting(false);
-    }
+    await deleteResource.mutateAsync(deleteTarget.id);
+    show({ type: 'success', title: 'Resource deleted' });
+    setDeleteTarget(null);
   };
 
   if (loading) return <div className="space-y-6"><CardGridSkeleton count={4} /></div>;
@@ -258,7 +236,7 @@ export function WorkspaceDetailPage() {
         message={`"${deleteTarget?.title}" will be permanently removed from this workspace.`}
         confirmLabel="Delete"
         variant="danger"
-        loading={deleting}
+        loading={deleteResource.isPending}
       />
     </div>
   );

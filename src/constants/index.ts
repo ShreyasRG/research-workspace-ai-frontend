@@ -11,3 +11,4 @@ export {
   WORKSPACE_COLORS,
 } from './resources';
 export { NAV_ITEMS } from './navigation';
+export { QUERY_KEYS } from './queryKeys';
