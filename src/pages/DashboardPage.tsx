@@ -3,38 +3,42 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Plus, FolderKanban, Sparkles, ArrowRight, FileText, Video } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useDashboard } from '../hooks/queries';
-import { useCreateWorkspace } from '../hooks/mutations';
+// import { useCreateWorkspace } from '../hooks/mutations';
 import { WorkspaceCard } from '../components/WorkspaceCard';
 import { ResourceCard } from '../components/ResourceCard';
 import { AISummaryCard } from '../components/AISummaryCard';
 import { CardGridSkeleton } from '../components/ui/Skeleton';
-import { Modal } from '../components/ui/Modal';
-import { useToast } from '../contexts/ToastContext';
+// import { Modal } from '../components/ui/Modal';
+// import { useToast } from '../contexts/ToastContext';
 import { formatRelative, cn } from '../utils';
 import { ROUTES, workspacePath } from '../constants';
+import { CreateWorkspaceModal } from '../components/workspace/CreateWorkspaceModal';
 
 export function DashboardPage() {
   const { user } = useAuth();
-  const { show } = useToast();
+  // const { show } = useToast();
   const navigate = useNavigate();
   const { data: dashboardData, isLoading } = useDashboard();
   const workspaces = dashboardData?.workspaces ?? [];
   const resources = dashboardData?.resources ?? [];
   const summaries = dashboardData?.summaries ?? [];
-  const createWorkspace = useCreateWorkspace();
+  // const createWorkspace = useCreateWorkspace();
   const [createOpen, setCreateOpen] = useState(false);
-  const [newTitle, setNewTitle] = useState('');
-  const [newDesc, setNewDesc] = useState('');
+  // const [newName, setNewName] = useState('');
+  // const [newDesc, setNewDesc] = useState('');
 
-  const handleCreate = async () => {
-    if (!newTitle.trim()) return;
-    const ws = await createWorkspace.mutateAsync({ title: newTitle, description: newDesc });
-    show({ type: 'success', title: 'Workspace created', message: ws.title });
-    setCreateOpen(false);
-    setNewTitle('');
-    setNewDesc('');
-    navigate(workspacePath(ws.id));
-  };
+//   const handleCreate = async () => {
+//     if (!newName.trim()) return;
+//     const ws = await createWorkspace.mutateAsync({
+//     name: newName,
+//     description: newDesc,
+// });
+//     show({ type: 'success', title: 'Workspace created', message: ws.title });
+//     setCreateOpen(false);
+//     setNewName('');
+//     setNewDesc('');
+//     navigate(workspacePath(ws.id));
+//   };
 
   const stats = [
     { label: 'Workspaces', value: workspaces.length, icon: FolderKanban, color: 'from-primary-500 to-accent-500' },
@@ -143,42 +147,11 @@ export function DashboardPage() {
         </section>
       </div>
 
-      <Modal
-        open={createOpen}
-        onClose={() => setCreateOpen(false)}
-        title="Create new workspace"
-        description="Organize your research into themed collections."
-        footer={
-          <>
-            <button className="btn-secondary" onClick={() => setCreateOpen(false)}>Cancel</button>
-            <button className="btn-primary" onClick={handleCreate} disabled={createWorkspace.isPending || !newTitle.trim()}>
-              {createWorkspace.isPending ? 'Creating…' : 'Create workspace'}
-            </button>
-          </>
-        }
-      >
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Title</label>
-            <input
-              className="input"
-              placeholder="e.g. Climate Science Research"
-              value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
-              autoFocus
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Description</label>
-            <textarea
-              className="input min-h-24 resize-none"
-              placeholder="What is this workspace about?"
-              value={newDesc}
-              onChange={(e) => setNewDesc(e.target.value)}
-            />
-          </div>
-        </div>
-      </Modal>
+<CreateWorkspaceModal
+  open={createOpen}
+  onClose={() => setCreateOpen(false)}
+  onSuccess={(workspace) => navigate(workspacePath(workspace.id))}
+/>
     </div>
   );
 }

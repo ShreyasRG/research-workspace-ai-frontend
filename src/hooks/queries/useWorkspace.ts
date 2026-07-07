@@ -1,11 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { workspaceService } from '../../services';
-import { QUERY_KEYS } from '../../constants';
 
-export function useWorkspace(id: string | undefined) {
+export function useWorkspace(id: string) {
   return useQuery({
-    queryKey: QUERY_KEYS.workspaces.detail(id ?? ''),
-    queryFn: () => workspaceService.getWorkspace(id!),
+    queryKey: ["workspace", id],
+    queryFn: () => workspaceService.getWorkspace(id),
     enabled: !!id,
   });
 }

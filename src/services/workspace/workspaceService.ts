@@ -1,42 +1,65 @@
-import type { Workspace } from '../../types';
-import { mockWorkspaces } from '../mockData';
-import { delay } from '../utils';
+import { graphqlClient } from "../../lib/graphql/graphqlClient";
+import {
+  GET_WORKSPACES,
+  GET_WORKSPACE,
+  CREATE_WORKSPACE,
+} from "../../lib/graphql/workspace/workspace.graphql";
+
+import type {
+  WorkspacePageResponseDTO,
+  WorkspaceResponseDTO,
+  CreateWorkspaceRequestDTO,
+} from "../../dto/workspace";
+
+import type { Workspace } from "../../types/workspace";
+import { toWorkspace } from "./workspaceMapper";
+
+type GetWorkspacesResponse = {
+  workspaces: WorkspacePageResponseDTO;
+};
+
+type GetWorkspaceResponse = {
+  workspace: WorkspaceResponseDTO;
+};
+
+type CreateWorkspaceResponse = {
+  createWorkspace: WorkspaceResponseDTO;
+};
 
 export const workspaceService = {
   async getWorkspaces(): Promise<Workspace[]> {
-    return delay(mockWorkspaces);
+    const response = await graphqlClient.request<GetWorkspacesResponse>(
+      GET_WORKSPACES,
+      {
+        pagination: {
+          page: 0,
+          size: 20,
+        },
+      }
+    );
+
+    return response.workspaces.content.map(toWorkspace);
   },
 
   async getWorkspace(id: string): Promise<Workspace | null> {
-    const ws = mockWorkspaces.find((w) => w.id === id) ?? null;
-    return delay(ws);
+    const response = await graphqlClient.request<GetWorkspaceResponse>(
+      GET_WORKSPACE,
+      { id }
+    );
+
+    return response.workspace ? toWorkspace(response.workspace) : null;
   },
 
-  async createWorkspace(input: {
-    title: string;
-    description: string;
-  }): Promise<Workspace> {
-    const newWs: Workspace = {
-      id: `ws${Date.now()}`,
-      title: input.title,
-      description: input.description,
-      createdAt: new Date().toISOString(),
-      owner: 'Alex Morgan',
-      ownerId: 'u1',
-      members: [
-        {
-          id: 'u1',
-          name: 'Alex Morgan',
-          email: 'alex.morgan@research.io',
-          avatarUrl: 'https://images.pexels.com/photos/220817/pexels-photo-220817.jpeg?auto=compress&cs=tinysrgb&w=200',
-          role: 'owner',
-        },
-      ],
-      color: 'from-primary-500 to-accent-500',
-      icon: 'FolderKanban',
-      resourceCount: 0,
-      summaryCount: 0,
-    };
-    return delay(newWs);
+  async createWorkspace(
+    input: CreateWorkspaceRequestDTO
+  ): Promise<Workspace> {
+    const response = await graphqlClient.request<CreateWorkspaceResponse>(
+      CREATE_WORKSPACE,
+      {
+        input,
+      }
+    );
+
+    return toWorkspace(response.createWorkspace);
   },
 };
