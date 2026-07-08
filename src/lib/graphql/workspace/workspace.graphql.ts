@@ -45,3 +45,15 @@ export const CREATE_WORKSPACE = gql`
     }
   }
 `;
+
+export const UPDATE_WORKSPACE = gql`
+  mutation UpdateWorkspace($input: UpdateWorkspaceInput!) {
+   updateWorkspace(input: $input) {
+        id
+        name
+        description
+        createdAt
+        updatedAt
+    }
+  }
+`;

@@ -6,6 +6,7 @@ import { useToast } from "../../contexts/ToastContext";
 import { Modal } from "../ui/Modal";
 
 import type { Workspace } from "../../types";
+import { WorkspaceForm } from "./WorkspaceForm";
 
 interface CreateWorkspaceModalProps {
   open: boolean;
@@ -25,13 +26,22 @@ export function CreateWorkspaceModal({
   const [description, setDescription] = useState("");
 
   const handleCreate = async () => {
-    if (!name.trim()) return;
+     console.log("Create clicked", { name, description });
+        if (!name.trim()) {
+            console.log("Returned because name is empty");
+            return;
+        }
+
+console.log("About to call mutation");
+        console.log("About to call mutation");
 
     try {
-      const workspace = await createWorkspace.mutateAsync({
-        name,
-        description,
-      });
+    const workspace = await createWorkspace.mutateAsync({
+      name,
+      description,
+    });
+
+    console.log("Mutation succeeded", workspace);
 
       show({
         type: "success",
@@ -100,34 +110,12 @@ export function CreateWorkspaceModal({
         </>
       }
     >
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-            Name
-          </label>
-
-          <input
-            className="input"
-            placeholder="e.g. Climate Science Research"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            autoFocus
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-            Description
-          </label>
-
-          <textarea
-            className="input min-h-24 resize-none"
-            placeholder="What is this workspace about?"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-        </div>
-      </div>
+<WorkspaceForm
+  name={name}
+  description={description}
+  onNameChange={setName}
+  onDescriptionChange={setDescription}
+/>
     </Modal>
   );
 }

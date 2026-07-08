@@ -24,3 +24,9 @@ export interface WorkspacePageResponseDTO {
     hasPrevious: boolean;
   };
 }
+
+export interface UpdateWorkspaceRequestDTO {
+  id: string;
+  name: string;
+  description: string;
+}

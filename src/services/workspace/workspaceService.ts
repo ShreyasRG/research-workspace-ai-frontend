@@ -3,12 +3,14 @@ import {
   GET_WORKSPACES,
   GET_WORKSPACE,
   CREATE_WORKSPACE,
+  UPDATE_WORKSPACE,
 } from "../../lib/graphql/workspace/workspace.graphql";
 
 import type {
   WorkspacePageResponseDTO,
   WorkspaceResponseDTO,
   CreateWorkspaceRequestDTO,
+  UpdateWorkspaceRequestDTO,
 } from "../../dto/workspace";
 
 import type { Workspace } from "../../types/workspace";
@@ -24,6 +26,10 @@ type GetWorkspaceResponse = {
 
 type CreateWorkspaceResponse = {
   createWorkspace: WorkspaceResponseDTO;
+};
+
+type UpdateWorkspaceResponse = {
+  updateWorkspace: WorkspaceResponseDTO;
 };
 
 export const workspaceService = {
@@ -61,5 +67,18 @@ export const workspaceService = {
     );
 
     return toWorkspace(response.createWorkspace);
+  },
+
+async updateWorkspace(
+    input: UpdateWorkspaceRequestDTO
+  ): Promise<Workspace> {
+    const response = await graphqlClient.request<UpdateWorkspaceResponse>(
+      UPDATE_WORKSPACE,
+      {
+        input,
+      }
+    );
+
+    return toWorkspace(response.updateWorkspace);
   },
 };

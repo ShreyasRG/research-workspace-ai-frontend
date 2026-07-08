@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Calendar, User, Users, FileText, Video, StickyNote, Sparkles, Trash2, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Plus, Calendar, User, Users, FileText, Video, StickyNote, Sparkles, Trash2, ExternalLink, Pencil } from 'lucide-react';
 import { useWorkspace, useResources, useSummaries } from '../hooks/queries';
 import { useAddResource, useDeleteResource } from '../hooks/mutations';
 import type { Resource, ResourceType } from '../types';
@@ -15,6 +15,7 @@ import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 import { useToast } from '../contexts/ToastContext';
 import { formatDate, cn } from '../utils';
 import { ROUTES } from '../constants';
+import { EditWorkspaceModal } from "../components/workspace/EditWorkspaceModal";
 
 const TABS: { id: string; label: string; icon: typeof FileText }[] = [
   { id: 'articles', label: 'Articles', icon: FileText },
@@ -38,6 +39,7 @@ export function WorkspaceDetailPage() {
   const [addOpen, setAddOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Resource | null>(null);
   const [newRes, setNewRes] = useState({ title: '', type: 'article' as ResourceType, sourceUrl: '' });
+  const [editOpen, setEditOpen] = useState(false);
 
   const handleAdd = async () => {
     if (!newRes.title.trim() || !id) return;
@@ -94,19 +96,37 @@ export function WorkspaceDetailPage() {
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="flex -space-x-2">
-              {workspace.members.map((m) => (
-                <Avatar key={m.id} name={m.name} src={m.avatarUrl} size="sm" />
-              ))}
-            </div>
-            <span className="text-sm text-gray-400 dark:text-gray-500 flex items-center gap-1">
-              <Users className="w-4 h-4" />
-              {workspace.members.length}
-            </span>
-          </div>
+
+
+      <div className="flex items-center gap-3">
+        <button
+          className="btn-secondary"
+          onClick={() => setEditOpen(true)}
+        >
+          <Pencil className="w-4 h-4" />
+          Edit
+        </button>
+
+        <div className="flex -space-x-2">
+          {workspace.members.map((m) => (
+            <Avatar
+              key={m.id}
+              name={m.name}
+              src={m.avatarUrl}
+              size="sm"
+            />
+          ))}
         </div>
+
+        <span className="text-sm text-gray-400 dark:text-gray-500 flex items-center gap-1">
+          <Users className="w-4 h-4" />
+          {workspace.members.length}
+        </span>
       </div>
+              </div>
+      </div>
+
+      {/* Tabs + Add */}
 
       {/* Tabs + Add */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -238,6 +258,11 @@ export function WorkspaceDetailPage() {
         variant="danger"
         loading={deleteResource.isPending}
       />
+      <EditWorkspaceModal
+  open={editOpen}
+  workspace={workspace}
+  onClose={() => setEditOpen(false)}
+/>
     </div>
   );
 }
