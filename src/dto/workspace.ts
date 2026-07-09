@@ -1,4 +1,3 @@
-import type { Workspace } from "../types/workspace";
 
 export interface CreateWorkspaceRequestDTO {
   name: string;

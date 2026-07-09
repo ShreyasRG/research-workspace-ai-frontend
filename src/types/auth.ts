@@ -1,23 +1,18 @@
-import type { ID } from './common';
+import type { ID } from "./common";
 
-export type UserRole = 'owner' | 'member' | 'viewer';
+export type AuthProvider = "LOCAL" | "GOOGLE" | "GITHUB";
 
 export interface User {
   id: ID;
-  name: string;
   email: string;
-  avatarUrl: string;
-  role: UserRole;
-  joinedDate: string;
+  displayName: string;
+  avatarUrl: string | null;
+  provider: AuthProvider;
+  enabled: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface AuthResponse {
-  user: User;
-  token: string;
-  refreshToken: string;
-}
-
-export interface StoredAuth {
-  user: User;
-  token: string;
+  accessToken: string;
 }

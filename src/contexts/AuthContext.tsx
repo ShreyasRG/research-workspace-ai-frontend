@@ -1,99 +1,125 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import type { User } from '../types';
-import { authService } from '../services';
-import { STORAGE_KEYS } from '../constants';
-import { getItem, setItem, removeItem } from '../utils/storage';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
+
+import type { User } from "../types";
+import { authApi } from "../services/auth/authApi";
 
 interface AuthContextValue {
   user: User | null;
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   loginWithGithub: () => Promise<void>;
-  loginAsDemo: () => Promise<void>;
   logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-interface StoredAuth {
-  user: User;
-  token: string;
-}
-
-export function AuthProvider({ children }: { children: ReactNode }) {
+export function AuthProvider({
+  children,
+}: {
+  children: ReactNode;
+}) {
   const [user, setUser] = useState<User | null>(null);
+
   const [token, setToken] = useState<string | null>(null);
+
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const stored = getItem<StoredAuth>(STORAGE_KEYS.auth);
-    if (stored) {
-      setUser(stored.user);
-      setToken(stored.token);
+    async function bootstrap() {
+      const storedToken = localStorage.getItem("access_token");
+
+      if (!storedToken) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const currentUser = await authApi.me();
+
+        setUser(currentUser);
+
+        setToken(storedToken);
+      } catch (error) {
+        console.error(error);
+
+        localStorage.removeItem("access_token");
+
+        setUser(null);
+
+        setToken(null);
+      }
+
+      setIsLoading(false);
     }
-    setIsLoading(false);
-  }, []);
 
-  const persist = useCallback((u: User, t: string) => {
-    setItem<StoredAuth>(STORAGE_KEYS.auth, { user: u, token: t });
-    setUser(u);
-    setToken(t);
+    bootstrap();
   }, []);
-
-  const clear = useCallback(() => {
-    removeItem(STORAGE_KEYS.auth);
-    setUser(null);
-    setToken(null);
-  }, []);
-
-  const login = useCallback(async (email: string, password: string) => {
-    const res = await authService.login(email, password);
-    persist(res.user, res.token);
-  }, [persist]);
 
   const loginWithGoogle = useCallback(async () => {
-    const res = await authService.loginWithGoogle();
-    persist(res.user, res.token);
-  }, [persist]);
+    window.location.href =
+      "http://localhost:8080/oauth2/authorization/google";
+  }, []);
 
   const loginWithGithub = useCallback(async () => {
-    const res = await authService.loginWithGithub();
-    persist(res.user, res.token);
-  }, [persist]);
-
-  const loginAsDemo = useCallback(async () => {
-    const res = await authService.loginAsDemo();
-    persist(res.user, res.token);
-  }, [persist]);
+    window.location.href =
+      "http://localhost:8080/oauth2/authorization/github";
+  }, []);
 
   const logout = useCallback(async () => {
-    await authService.logout();
-    clear();
-  }, [clear]);
+    localStorage.removeItem("access_token");
 
-  const value = useMemo<AuthContextValue>(
+    setUser(null);
+
+    setToken(null);
+
+    window.location.href = "/login";
+  }, []);
+
+  const value = useMemo(
     () => ({
       user,
       token,
       isAuthenticated: !!user && !!token,
       isLoading,
-      login,
       loginWithGoogle,
       loginWithGithub,
-      loginAsDemo,
       logout,
     }),
-    [user, token, isLoading, login, loginWithGoogle, loginWithGithub, loginAsDemo, logout],
+    [
+      user,
+      token,
+      isLoading,
+      loginWithGoogle,
+      loginWithGithub,
+      logout,
+    ]
   );
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider');
-  return ctx;
+  const context = useContext(AuthContext);
+
+  if (!context) {
+    throw new Error(
+      "useAuth must be used within AuthProvider"
+    );
+  }
+
+  return context;
 }

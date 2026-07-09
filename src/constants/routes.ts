@@ -8,6 +8,7 @@ export const ROUTES = {
   SUMMARIES: '/summaries',
   SUMMARY_DETAIL: '/summaries/:id',
   PROFILE: '/profile',
+  OAUTH_CALLBACK: "/oauth/callback",
   ROOT: '/',
 } as const;
 
@@ -22,3 +23,4 @@ export function resourcePath(id: string): string {
 export function summaryPath(id: string): string {
   return `/summaries/${id}`;
 }
+

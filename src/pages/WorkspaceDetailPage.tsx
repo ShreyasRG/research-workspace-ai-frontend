@@ -26,6 +26,10 @@ const TABS: { id: string; label: string; icon: typeof FileText }[] = [
 
 export function WorkspaceDetailPage() {
   const { id } = useParams<{ id: string }>();
+
+if (!id) {
+  return <ErrorState onRetry={() => navigate(ROUTES.WORKSPACES)} />;
+}
   const navigate = useNavigate();
   const { show } = useToast();
   const { data: workspace, isLoading: wsLoading, error: wsError } = useWorkspace(id);

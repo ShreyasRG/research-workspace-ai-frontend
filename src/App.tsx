@@ -17,6 +17,8 @@ import { SearchPage } from './pages/SearchPage';
 import { SummariesPage } from './pages/SummariesPage';
 import { SummaryDetailPage } from './pages/SummaryDetailPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { OAuthCallback } from './services/auth/OAuthCallback';
+
 
 export default function App() {
   return (
@@ -28,6 +30,7 @@ export default function App() {
               <BrowserRouter>
               <Routes>
                 <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+                <Route path={ROUTES.OAUTH_CALLBACK} element={<OAuthCallback />} />
                 <Route
                   path={ROUTES.ROOT}
                   element={

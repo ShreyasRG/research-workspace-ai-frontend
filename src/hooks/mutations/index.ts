@@ -3,4 +3,4 @@ export { useDeleteWorkspace } from './useDeleteWorkspace';
 export { useAddResource } from './useAddResource';
 export { useDeleteResource } from './useDeleteResource';
 export { useUpdateProfile } from './useUpdateProfile';
-export * from "./useUpdateWorkspace";
+export { useUpdateWorkspace } from './useUpdateWorkspace';

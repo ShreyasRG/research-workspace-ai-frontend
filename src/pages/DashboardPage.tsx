@@ -56,7 +56,7 @@ export function DashboardPage() {
         <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <p className="text-primary-200 text-sm font-medium">{formatRelative(new Date().toISOString())}</p>
-            <h1 className="text-2xl md:text-3xl font-bold mt-1">Welcome back, {user?.name?.split(' ')[0]} 👋</h1>
+            <h1 className="text-2xl md:text-3xl font-bold mt-1">Welcome back, {user?.displayName?.split(' ')[0]} 👋</h1>
             <p className="text-primary-100 mt-2 max-w-lg">
               You have {summaries.length} AI summaries and {resources.length} resources across {workspaces.length} workspaces.
             </p>

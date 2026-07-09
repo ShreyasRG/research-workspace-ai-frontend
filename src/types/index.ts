@@ -1,5 +1,5 @@
 export type { ID, Tag, PaginatedResponse, Theme } from './common';
-export type { User, UserRole, AuthResponse, StoredAuth } from './auth';
+export type { User, AuthResponse } from './auth';
 export type { Workspace, WorkspaceMember } from './workspace';
 export type {
   Resource,
