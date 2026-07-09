@@ -37,7 +37,10 @@ export function AuthProvider({
 
   useEffect(() => {
     async function bootstrap() {
+
+      console.log("Bootstrap started");
       const storedToken = localStorage.getItem("access_token");
+      console.log("Stored token:", storedToken);
 
       if (!storedToken) {
         setIsLoading(false);
@@ -46,10 +49,13 @@ export function AuthProvider({
 
       try {
         const currentUser = await authApi.me();
+        console.log("Current user:", currentUser);
 
         setUser(currentUser);
+        console.log("User state updated");
 
         setToken(storedToken);
+        console.log("Token state updated");
       } catch (error) {
         console.error(error);
 
@@ -105,6 +111,8 @@ export function AuthProvider({
       logout,
     ]
   );
+
+  console.log("########## AUTH CONTEXT ##########");
 
   return (
     <AuthContext.Provider value={value}>

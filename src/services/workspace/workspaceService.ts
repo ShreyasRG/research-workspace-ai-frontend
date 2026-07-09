@@ -1,4 +1,5 @@
-import { graphqlClient } from "../../lib/graphql/graphqlClient";
+import { createGraphQLClient } from "../../lib/graphql/createGraphQLClient";
+
 import {
   GET_WORKSPACES,
   GET_WORKSPACE,
@@ -15,6 +16,8 @@ import type {
 
 import type { Workspace } from "../../types/workspace";
 import { toWorkspace } from "./workspaceMapper";
+
+const graphqlClient = createGraphQLClient();
 
 type GetWorkspacesResponse = {
   workspaces: WorkspacePageResponseDTO;
