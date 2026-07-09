@@ -22,6 +22,7 @@ interface AuthContextValue {
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
+const apiBaseUrl = import.meta.env.VITE_GRAPHQL_URL.replace("/graphql", "");
 
 export function AuthProvider({
   children,
@@ -67,12 +68,12 @@ export function AuthProvider({
 
   const loginWithGoogle = useCallback(async () => {
     window.location.href =
-      "http://localhost:8080/oauth2/authorization/google";
+      `${apiBaseUrl}/oauth2/authorization/google`;
   }, []);
 
   const loginWithGithub = useCallback(async () => {
     window.location.href =
-      "http://localhost:8080/oauth2/authorization/github";
+      `${apiBaseUrl}/oauth2/authorization/github`;
   }, []);
 
   const logout = useCallback(async () => {
