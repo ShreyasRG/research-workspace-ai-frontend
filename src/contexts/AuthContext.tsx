@@ -18,6 +18,7 @@ interface AuthContextValue {
   isLoading: boolean;
   loginWithGoogle: () => Promise<void>;
   loginWithGithub: () => Promise<void>;
+  completeOAuthLogin: (token: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -37,10 +38,7 @@ export function AuthProvider({
 
   useEffect(() => {
     async function bootstrap() {
-
-      console.log("Bootstrap started");
       const storedToken = localStorage.getItem("access_token");
-      console.log("Stored token:", storedToken);
 
       if (!storedToken) {
         setIsLoading(false);
@@ -49,20 +47,12 @@ export function AuthProvider({
 
       try {
         const currentUser = await authApi.me();
-        console.log("Current user:", currentUser);
-
         setUser(currentUser);
-        console.log("User state updated");
-
         setToken(storedToken);
-        console.log("Token state updated");
       } catch (error) {
         console.error(error);
-
         localStorage.removeItem("access_token");
-
         setUser(null);
-
         setToken(null);
       }
 
@@ -80,6 +70,31 @@ export function AuthProvider({
   const loginWithGithub = useCallback(async () => {
     window.location.href =
       `${apiBaseUrl}/oauth2/authorization/github`;
+  }, []);
+
+  // Completes login from OAuthCallback WITHOUT any full page
+  // reload/navigation. This deliberately avoids window.location.href/
+  // replace/reload after the Google -> backend -> frontend redirect
+  // chain: an extra hard navigation immediately following a cross-site
+  // round trip can be treated by WebKit (Safari/Chrome on iOS share the
+  // same engine) as a tracking "bounce," which can clear localStorage
+  // for this origin right after we write the token. Updating context
+  // state directly sidesteps that entirely - no second navigation for
+  // WebKit to flag.
+  const completeOAuthLogin = useCallback(async (newToken: string) => {
+    localStorage.setItem("access_token", newToken);
+    setToken(newToken);
+
+    try {
+      const currentUser = await authApi.me();
+      setUser(currentUser);
+    } catch (error) {
+      console.error(error);
+      localStorage.removeItem("access_token");
+      setUser(null);
+      setToken(null);
+      throw error;
+    }
   }, []);
 
   const logout = useCallback(async () => {
@@ -100,6 +115,7 @@ export function AuthProvider({
       isLoading,
       loginWithGoogle,
       loginWithGithub,
+      completeOAuthLogin,
       logout,
     }),
     [
@@ -108,11 +124,10 @@ export function AuthProvider({
       isLoading,
       loginWithGoogle,
       loginWithGithub,
+      completeOAuthLogin,
       logout,
     ]
   );
-
-  console.log("########## AUTH CONTEXT ##########");
 
   return (
     <AuthContext.Provider value={value}>
