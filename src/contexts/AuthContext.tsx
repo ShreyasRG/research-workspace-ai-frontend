@@ -10,6 +10,7 @@ import {
 
 import type { User } from "../types";
 import { authApi } from "../services/auth/authApi";
+import { queryClient } from "../lib/query/queryClient";
 
 interface AuthContextValue {
   user: User | null;
@@ -73,14 +74,9 @@ export function AuthProvider({
   }, []);
 
   // Completes login from OAuthCallback WITHOUT any full page
-  // reload/navigation. This deliberately avoids window.location.href/
-  // replace/reload after the Google -> backend -> frontend redirect
-  // chain: an extra hard navigation immediately following a cross-site
-  // round trip can be treated by WebKit (Safari/Chrome on iOS share the
-  // same engine) as a tracking "bounce," which can clear localStorage
-  // for this origin right after we write the token. Updating context
-  // state directly sidesteps that entirely - no second navigation for
-  // WebKit to flag.
+  // reload/navigation (see OAuthCallback.tsx for why - iOS WebKit can
+  // clear localStorage after an extra hard navigation following a
+  // cross-site redirect).
   const completeOAuthLogin = useCallback(async (newToken: string) => {
     localStorage.setItem("access_token", newToken);
     setToken(newToken);
@@ -88,6 +84,13 @@ export function AuthProvider({
     try {
       const currentUser = await authApi.me();
       setUser(currentUser);
+
+      // Wipe any cached query data from a previous session on this tab.
+      // Without this, if a different user previously logged out (or the
+      // cache simply hasn't expired yet), React Query could briefly
+      // render stale/previous-user data for the newly logged-in user
+      // before their own queries refetch.
+      queryClient.clear();
     } catch (error) {
       console.error(error);
       localStorage.removeItem("access_token");
@@ -103,6 +106,11 @@ export function AuthProvider({
     setUser(null);
 
     setToken(null);
+
+    // Clear cached query data on logout too, so the next person to log
+    // in on this browser/tab never has a chance to see this user's
+    // cached dashboard/workspace data, even momentarily.
+    queryClient.clear();
 
     window.location.href = "/login";
   }, []);
