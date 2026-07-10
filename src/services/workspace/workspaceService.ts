@@ -5,6 +5,7 @@ import {
   GET_WORKSPACE,
   CREATE_WORKSPACE,
   UPDATE_WORKSPACE,
+  DELETE_WORKSPACE,
 } from "../../lib/graphql/workspace/workspace.graphql";
 
 import type {
@@ -33,6 +34,10 @@ type CreateWorkspaceResponse = {
 
 type UpdateWorkspaceResponse = {
   updateWorkspace: WorkspaceResponseDTO;
+};
+
+type DeleteWorkspaceResponse = {
+  deleteWorkspace: boolean;
 };
 
 export const workspaceService = {
@@ -83,5 +88,17 @@ async updateWorkspace(
     );
 
     return toWorkspace(response.updateWorkspace);
+  },
+
+  async deleteWorkspace(id: string): Promise<boolean> {
+    const response =
+      await graphqlClient.request<DeleteWorkspaceResponse>(
+        DELETE_WORKSPACE,
+        {
+          workspaceId: id,
+        }
+      );
+
+    return response.deleteWorkspace;
   },
 };

@@ -2,7 +2,11 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, Calendar, User, Users, FileText, Video, StickyNote, Sparkles, Trash2, ExternalLink, Pencil } from 'lucide-react';
 import { useWorkspace, useResources, useSummaries } from '../hooks/queries';
-import { useAddResource, useDeleteResource } from '../hooks/mutations';
+import {
+  useAddResource,
+  useDeleteResource,
+  useDeleteWorkspace,
+} from "../hooks/mutations";
 import type { Resource, ResourceType } from '../types';
 import { ResourceCard } from '../components/ResourceCard';
 import { AISummaryCard } from '../components/AISummaryCard';
@@ -39,11 +43,13 @@ if (!id) {
   const error = !!wsError || (!wsLoading && !workspace);
   const addResource = useAddResource();
   const deleteResource = useDeleteResource();
+  const deleteWorkspace = useDeleteWorkspace();
   const [activeTab, setActiveTab] = useState('articles');
   const [addOpen, setAddOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Resource | null>(null);
   const [newRes, setNewRes] = useState({ title: '', type: 'article' as ResourceType, sourceUrl: '' });
   const [editOpen, setEditOpen] = useState(false);
+  const [deleteWorkspaceOpen, setDeleteWorkspaceOpen] = useState(false);
 
   const handleAdd = async () => {
     if (!newRes.title.trim() || !id) return;
@@ -59,11 +65,39 @@ if (!id) {
   };
 
   const handleDelete = async () => {
-    if (!deleteTarget) return;
-    await deleteResource.mutateAsync(deleteTarget.id);
-    show({ type: 'success', title: 'Resource deleted' });
-    setDeleteTarget(null);
-  };
+  if (!deleteTarget) return;
+
+  await deleteResource.mutateAsync(deleteTarget.id);
+
+  show({
+    type: "success",
+    title: "Resource deleted",
+  });
+
+  setDeleteTarget(null);
+};
+
+const handleDeleteWorkspace = async () => {
+  if (!id) return;
+
+  try {
+    await deleteWorkspace.mutateAsync(id);
+
+    setDeleteWorkspaceOpen(false);
+
+    show({
+      type: "success",
+      title: "Workspace deleted",
+    });
+
+    navigate(ROUTES.WORKSPACES);
+  } catch {
+    show({
+      type: "error",
+      title: "Failed to delete workspace",
+    });
+  }
+};
 
   if (loading) return <div className="space-y-6"><CardGridSkeleton count={4} /></div>;
   if (error || !workspace) return <ErrorState onRetry={() => navigate(ROUTES.WORKSPACES)} />;
@@ -109,6 +143,14 @@ if (!id) {
         >
           <Pencil className="w-4 h-4" />
           Edit
+        </button>
+
+        <button
+          className="btn-secondary hover:border-error-500 hover:text-error-600 dark:hover:text-error-400"
+          onClick={() => setDeleteWorkspaceOpen(true)}
+        >
+          <Trash2 className="w-4 h-4" />
+          Delete
         </button>
 
         <div className="flex -space-x-2">
@@ -253,15 +295,15 @@ if (!id) {
       </Modal>
 
       <ConfirmDialog
-        open={!!deleteTarget}
-        onClose={() => setDeleteTarget(null)}
-        onConfirm={handleDelete}
-        title="Delete resource?"
-        message={`"${deleteTarget?.title}" will be permanently removed from this workspace.`}
+        open={deleteWorkspaceOpen}
+        onClose={() => setDeleteWorkspaceOpen(false)}
+        onConfirm={handleDeleteWorkspace}
+        title="Delete workspace?"
+        message={`"${workspace.title}" will be permanently deleted. This action cannot be undone.`}
         confirmLabel="Delete"
         variant="danger"
-        loading={deleteResource.isPending}
-      />
+        loading={deleteWorkspace.isPending}
+/>
       <EditWorkspaceModal
   open={editOpen}
   workspace={workspace}

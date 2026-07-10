@@ -43,10 +43,10 @@ export function ConfirmDialog({
             {cancelLabel}
           </button>
           <button
-            className={`btn flex-1 text-white ${
+            className={`btn-secondary flex-1 ${
               variant === 'danger'
-                ? 'bg-error-600 hover:bg-error-700 active:bg-error-800'
-                : 'bg-primary-600 hover:bg-primary-700 active:bg-primary-800'
+                ? 'text-error-600 border-error-300 hover:bg-error-50 hover:border-error-500 dark:text-error-400 dark:border-error-800 dark:hover:bg-error-950/30'
+                : 'btn-primary'
             }`}
             onClick={onConfirm}
             disabled={loading}

@@ -30,18 +30,24 @@ export function LoginPage() {
   };
 
   const handleSocial = async (provider: 'google' | 'github') => {
-    setLoading(provider);
-    try {
-      if (provider === 'google') await loginWithGoogle();
-      else await loginWithGithub();
-      show({ type: 'success', title: `Signed in with ${provider === 'google' ? 'Google' : 'GitHub'}` });
-      navigate(ROUTES.DASHBOARD);
-    } catch {
-      show({ type: 'error', title: 'Authentication failed' });
-    } finally {
-      setLoading(null);
-    }
-  };
+  setLoading(provider);
+  try {
+    if (provider === 'google') await loginWithGoogle();
+    else await loginWithGithub();
+    
+    // Smooth, universal text that works perfectly for both paths
+    show({ 
+      type: 'success', 
+      title: 'Signing you in...' 
+    });
+    
+    navigate(ROUTES.DASHBOARD);
+  } catch {
+    show({ type: 'error', title: 'Authentication failed' });
+  } finally {
+    setLoading(null);
+  }
+};
 
   const handleDemo = async () => {
     setLoading('demo');
