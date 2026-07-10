@@ -1,11 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import { useToast } from "../../contexts/ToastContext";
+import { LoadingScreen } from "../../routes/LoadingScreen";
 
 export function OAuthCallback() {
   const navigate = useNavigate();
   const { completeOAuthLogin } = useAuth();
-  const [error, setError] = useState(false);
+  const { show } = useToast();
 
   useEffect(() => {
     const token = new URLSearchParams(window.location.search).get("token");
@@ -28,15 +30,15 @@ export function OAuthCallback() {
         navigate("/dashboard", { replace: true });
       })
       .catch(() => {
-        setError(true);
         localStorage.removeItem("access_token");
+        show({
+          type: "error",
+          title: "Sign in failed",
+          message: "Please try signing in again.",
+        });
         navigate("/login", { replace: true });
       });
-  }, [navigate, completeOAuthLogin]);
+  }, [navigate, completeOAuthLogin, show]);
 
-  if (error) {
-    return <p>Sign in failed. Redirecting...</p>;
-  }
-
-  return <p>Signing you in...</p>;
+  return <LoadingScreen />;
 }
