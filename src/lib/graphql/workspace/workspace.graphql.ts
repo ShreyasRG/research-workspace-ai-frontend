@@ -1,14 +1,31 @@
 import { gql } from "graphql-request";
 
+const WORKSPACE_FIELDS = gql`
+  id
+  name
+  description
+  color
+  icon
+  ownerId
+  ownerName
+  members {
+    id
+    name
+    email
+    avatarUrl
+    role
+  }
+  resourceCount
+  summaryCount
+  createdAt
+  updatedAt
+`;
+
 export const GET_WORKSPACES = gql`
   query GetWorkspaces($pagination: PaginationInput!) {
     workspaces(pagination: $pagination) {
       content {
-        id
-        name
-        description
-        createdAt
-        updatedAt
+        ${WORKSPACE_FIELDS}
       }
       pageInfo {
         page
@@ -25,11 +42,7 @@ export const GET_WORKSPACES = gql`
 export const GET_WORKSPACE = gql`
   query GetWorkspace($id: ID!) {
     workspace(id: $id) {
-      id
-      name
-      description
-      createdAt
-      updatedAt
+      ${WORKSPACE_FIELDS}
     }
   }
 `;
@@ -37,23 +50,15 @@ export const GET_WORKSPACE = gql`
 export const CREATE_WORKSPACE = gql`
   mutation CreateWorkspace($input: CreateWorkspaceInput!) {
     createWorkspace(input: $input) {
-      id
-      name
-      description
-      createdAt
-      updatedAt
+      ${WORKSPACE_FIELDS}
     }
   }
 `;
 
 export const UPDATE_WORKSPACE = gql`
   mutation UpdateWorkspace($input: UpdateWorkspaceInput!) {
-   updateWorkspace(input: $input) {
-        id
-        name
-        description
-        createdAt
-        updatedAt
+    updateWorkspace(input: $input) {
+      ${WORKSPACE_FIELDS}
     }
   }
 `;

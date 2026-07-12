@@ -30,17 +30,17 @@ const TABS: { id: string; label: string; icon: typeof FileText }[] = [
 
 export function WorkspaceDetailPage() {
   const { id } = useParams<{ id: string }>();
-
-if (!id) {
-  return <ErrorState onRetry={() => navigate(ROUTES.WORKSPACES)} />;
-}
   const navigate = useNavigate();
   const { show } = useToast();
+
+  if (!id) {
+    return <ErrorState onRetry={() => navigate(ROUTES.WORKSPACES)} />;
+  }
   const { data: workspace, isLoading: wsLoading, error: wsError } = useWorkspace(id);
   const { data: resources = [], isLoading: resLoading } = useResources(id);
   const { data: summaries = [], isLoading: sumLoading } = useSummaries(id);
   const loading = wsLoading || resLoading || sumLoading;
-  const error = !!wsError || (!wsLoading && !workspace);
+  const error = !id || !!wsError || (!wsLoading && !workspace);
   const addResource = useAddResource();
   const deleteResource = useDeleteResource();
   const deleteWorkspace = useDeleteWorkspace();
@@ -58,7 +58,7 @@ if (!id) {
       title: newRes.title,
       type: newRes.type,
       sourceUrl: newRes.sourceUrl,
-    });
+    }) as Resource;
     show({ type: 'success', title: 'Resource added', message: r.title });
     setAddOpen(false);
     setNewRes({ title: '', type: 'article', sourceUrl: '' });
@@ -66,14 +66,11 @@ if (!id) {
 
   const handleDelete = async () => {
   if (!deleteTarget) return;
-
-  await deleteResource.mutateAsync(deleteTarget.id);
-
-  show({
-    type: "success",
-    title: "Resource deleted",
+  await deleteResource.mutateAsync({
+    id: deleteTarget.id,
+    workspaceId: deleteTarget.workspaceId,
   });
-
+  show({ type: 'success', title: 'Resource deleted' });
   setDeleteTarget(null);
 };
 
@@ -304,6 +301,18 @@ const handleDeleteWorkspace = async () => {
         variant="danger"
         loading={deleteWorkspace.isPending}
 />
+
+        <ConfirmDialog
+          open={!!deleteTarget}
+          onClose={() => setDeleteTarget(null)}
+          onConfirm={handleDelete}
+          title="Delete resource?"
+          message={`"${deleteTarget?.title}" will be permanently removed from this workspace.`}
+          confirmLabel="Delete"
+          variant="danger"
+          loading={deleteResource.isPending}
+        />
+
       <EditWorkspaceModal
   open={editOpen}
   workspace={workspace}
