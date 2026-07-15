@@ -14,8 +14,15 @@ export function Sidebar() {
   const navigate = useNavigate();
 
   return (
-    <aside className={cn('h-screen sticky top-0 flex flex-col border-r border-border-default bg-canvas-default transition-all duration-150', collapsed ? 'w-[52px]' : 'w-56')}>
-      <div className={cn('flex items-center h-12 border-b border-border-default shrink-0', collapsed ? 'justify-center' : 'px-3 gap-2')}>
+    <aside
+  className={cn(
+    'h-screen sticky top-0 flex flex-col transition-all duration-150',
+    theme === 'dark'
+      ? 'bg-[#0B1220] border-r border-[#1E293B]'
+      : 'bg-canvas-default border-r border-border-default',
+    collapsed ? 'w-[52px]' : 'w-56'
+  )}
+>      <div className={cn('flex items-center h-12 border-b border-border-default shrink-0', collapsed ? 'justify-center' : 'px-3 gap-2')}>
         <div className="w-7 h-7 rounded-md bg-fg-default flex items-center justify-center shrink-0">
           <svg className="w-4 h-4 text-canvas-default" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.2.73.94.83 1.18.2.55.83 1.58 2.26 1.26.03.4.06.78.06 1.17 0 .21-.15.45-.55.38A8.013 8.013 0 0 1 0 8c0-4.42 3.58-8 8-8z"/></svg>
         </div>
