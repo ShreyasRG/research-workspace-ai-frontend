@@ -1,0 +1,204 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply font-sans antialiased bg-canvas-subtle text-fg-default;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors disabled:opacity-60 disabled:cursor-not-allowed border;
+  }
+  .btn-primary {
+    @apply btn bg-accent-emphasis text-white border-accent-emphasis hover:bg-[#0860ca];
+  }
+  .btn-secondary {
+    @apply btn bg-canvas-default text-fg-default border-border-default hover:bg-canvas-subtle;
+  }
+  .btn-danger {
+    @apply btn bg-danger-emphasis text-white border-danger-emphasis hover:bg-[#bb2929];
+  }
+  .btn-ghost {
+    @apply btn bg-transparent text-fg-muted border-transparent hover:bg-canvas-subtle;
+  }
+  .btn-sm { @apply px-2 py-1 text-xs; }
+
+  .input {
+    @apply w-full px-3 py-1.5 rounded-md bg-canvas-default border border-border-default text-sm text-fg-default placeholder-fg-subtle focus:outline-none focus:ring-2 focus:ring-accent-muted/30 focus:border-accent-fg transition-colors;
+  }
+
+  .box { @apply bg-canvas-default border border-border-default rounded-md; }
+  .box-hover { @apply box hover:border-fg-muted transition-colors; }
+
+  .label { @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border; }
+  .label-accent { @apply label bg-accent-subtle text-accent-fg border-accent-muted/30; }
+  .label-success { @apply label bg-success-subtle text-success-fg border-success-fg/20; }
+  .label-attention { @apply label bg-attention-subtle text-attention-fg border-attention-emphasis/30; }
+  .label-danger { @apply label bg-danger-subtle text-danger-fg border-danger-fg/20; }
+  .label-done { @apply label bg-done-subtle text-done-fg border-done-fg/20; }
+  .label-neutral { @apply label bg-canvas-subtle text-fg-muted border-border-default; }
+
+  .link { @apply text-accent-fg hover:underline cursor-pointer; }
+  .section-heading { @apply text-base font-semibold text-fg-default; }
+  .text-subtle { @apply text-fg-muted text-sm; }
+}
+
+/* ── Dark mode: Monochromatic Minimalism ──────────────────────
+   Pure charcoal grays — no colored tints.
+   #121212  page background
+   #1a1a1a  elevated surfaces (cards, sidebar, modals)
+   #252525  hover / inset backgrounds
+   #333333  borders
+   #E0E0E0  primary text
+   #B0B0B0  muted text
+   #888888  subtle text / placeholders
+   Accent in dark mode: #E0E0E0 (white-ish) for buttons/links
+   ─────────────────────────────────────────────────────────── */
+.dark {
+  --tw-bg-canvas-default: #1a1a1a;
+  --tw-bg-canvas-subtle: #121212;
+  --tw-bg-canvas-inset: #252525;
+  --tw-border-default: #333333;
+  --tw-border-muted: #2a2a2a;
+  --tw-fg-default: #E0E0E0;
+  --tw-fg-muted: #B0B0B0;
+  --tw-fg-subtle: #888888;
+}
+
+.dark body {
+  background-color: #121212;
+  color: #E0E0E0;
+}
+
+/* Override Tailwind color utilities in dark mode to monochromatic grays */
+.dark .bg-canvas-default { background-color: #1a1a1a !important; }
+.dark .bg-canvas-subtle { background-color: #121212 !important; }
+.dark .bg-canvas-inset { background-color: #252525 !important; }
+.dark .border-border-default { border-color: #333333 !important; }
+.dark .border-border-muted { border-color: #2a2a2a !important; }
+.dark .text-fg-default { color: #E0E0E0 !important; }
+.dark .text-fg-muted { color: #B0B0B0 !important; }
+.dark .text-fg-subtle { color: #888888 !important; }
+.dark .placeholder-fg-subtle::placeholder { color: #888888 !important; }
+
+/* Dark mode: accent becomes monochromatic white */
+.dark .btn-primary {
+  background-color: #E0E0E0 !important;
+  color: #121212 !important;
+  border-color: #E0E0E0 !important;
+}
+.dark .btn-primary:hover { background-color: #c8c8c8 !important; }
+.dark .btn-secondary {
+  background-color: #1a1a1a !important;
+  color: #E0E0E0 !important;
+  border-color: #333333 !important;
+}
+.dark .btn-secondary:hover { background-color: #252525 !important; }
+.dark .btn-ghost {
+  background-color: transparent !important;
+  color: #B0B0B0 !important;
+  border-color: transparent !important;
+}
+.dark .btn-ghost:hover { background-color: #252525 !important; }
+.dark .btn-danger {
+  background-color: #444444 !important;
+  color: #E0E0E0 !important;
+  border-color: #444444 !important;
+}
+.dark .btn-danger:hover { background-color: #555555 !important; }
+
+/* Dark mode: inputs */
+.dark .input {
+  background-color: #1a1a1a !important;
+  border-color: #333333 !important;
+  color: #E0E0E0 !important;
+}
+.dark .input::placeholder { color: #888888 !important; }
+.dark .input:focus {
+  border-color: #E0E0E0 !important;
+  --tw-ring-color: rgba(224, 224, 224, 0.2) !important;
+}
+
+/* Dark mode: boxes */
+.dark .box {
+  background-color: #1a1a1a !important;
+  border-color: #333333 !important;
+}
+.dark .box-hover:hover { border-color: #555555 !important; }
+
+/* Dark mode: labels become monochromatic */
+.dark .label-accent {
+  background-color: #252525 !important;
+  color: #E0E0E0 !important;
+  border-color: #444444 !important;
+}
+.dark .label-success {
+  background-color: #252525 !important;
+  color: #B0B0B0 !important;
+  border-color: #444444 !important;
+}
+.dark .label-attention {
+  background-color: #252525 !important;
+  color: #B0B0B0 !important;
+  border-color: #444444 !important;
+}
+.dark .label-danger {
+  background-color: #252525 !important;
+  color: #B0B0B0 !important;
+  border-color: #444444 !important;
+}
+.dark .label-done {
+  background-color: #252525 !important;
+  color: #B0B0B0 !important;
+  border-color: #444444 !important;
+}
+.dark .label-neutral {
+  background-color: #252525 !important;
+  color: #B0B0B0 !important;
+  border-color: #444444 !important;
+}
+
+/* Dark mode: links */
+.dark .link { color: #E0E0E0 !important; }
+.dark .text-accent-fg { color: #E0E0E0 !important; }
+.dark .hover\:text-accent-fg:hover { color: #E0E0E0 !important; }
+
+/* Dark mode: semantic colors become monochromatic */
+.dark .text-success-fg { color: #B0B0B0 !important; }
+.dark .text-attention-fg { color: #B0B0B0 !important; }
+.dark .text-danger-fg { color: #B0B0B0 !important; }
+.dark .text-done-fg { color: #B0B0B0 !important; }
+.dark .bg-success-subtle { background-color: #252525 !important; }
+.dark .bg-attention-subtle { background-color: #252525 !important; }
+.dark .bg-danger-subtle { background-color: #252525 !important; }
+.dark .bg-done-subtle { background-color: #252525 !important; }
+.dark .bg-accent-subtle { background-color: #252525 !important; }
+.dark .border-accent-muted\/30 { border-color: #444444 !important; }
+.dark .border-success-fg\/20 { border-color: #444444 !important; }
+.dark .border-danger-fg\/20 { border-color: #444444 !important; }
+.dark .border-done-fg\/20 { border-color: #444444 !important; }
+.dark .border-attention-emphasis\/30 { border-color: #444444 !important; }
+
+/* Dark mode: divide colors */
+.dark .divide-border-muted > * + * { border-color: #2a2a2a !important; }
+
+/* Dark mode: ring focus */
+.dark .focus\:ring-accent-muted\/30:focus { --tw-ring-color: rgba(224, 224, 224, 0.2) !important; }
+.dark .focus\:border-accent-fg:focus { border-color: #E0E0E0 !important; }
+
+/* Scrollbar — monochromatic */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d0d7de; border-radius: 5px; border: 2px solid transparent; background-clip: content-box; }
+::-webkit-scrollbar-thumb:hover { background: #afb8c1; background-clip: content-box; }
+.dark ::-webkit-scrollbar-thumb { background: #333333; }
+.dark ::-webkit-scrollbar-thumb:hover { background: #444444; }
+/* Custom Dark Mode Hover Override */
+.dark .hover\:bg-canvas-subtle:hover {
+  background-color: #252525 !important; /* Change #252525 to your preferred dark hover color */
+}

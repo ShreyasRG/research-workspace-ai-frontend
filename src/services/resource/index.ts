@@ -1,0 +1,1 @@
+export { resourceService } from './resourceService';
