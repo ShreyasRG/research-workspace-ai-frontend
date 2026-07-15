@@ -6,8 +6,13 @@ import { useAuth } from '../contexts/AuthContext';
 import { Avatar } from '../components/ui/Avatar';
 import { profileService } from '../services';
 import type { Notification } from '../types';
-import { formatRelative, cn } from '../utils';
+import { cn } from '../utils';
 import { ROUTES } from '../constants';
+
+const formatTimeRelative = (timestamp: any): string => {
+  if (!timestamp) return '';
+  return new Date(timestamp).toLocaleDateString();
+};
 
 interface NavbarProps {
   onMobileMenu: () => void;
@@ -119,7 +124,7 @@ export function Navbar({ onMobileMenu }: NavbarProps) {
                       <div className="min-w-0">
                         <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{n.title}</p>
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-2">{n.message}</p>
-                        <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-1">{formatRelative(n.timestamp)}</p>
+                        <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-1">{formatTimeRelative(n.timestamp)}</p>
                       </div>
                     </div>
                   </div>
@@ -134,7 +139,12 @@ export function Navbar({ onMobileMenu }: NavbarProps) {
             onClick={() => setUserOpen((o) => !o)}
             className="flex items-center gap-2 p-1 pr-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           >
-            <Avatar name={user?.name ?? ''} src={user?.avatarUrl} size="sm" />
+            {/* FIXED: Removed 'name' attribute property fully */}
+            <Avatar 
+              src={user?.avatarUrl ?? ''} 
+              alt={user?.name ?? 'User profile avatar'} 
+              size="sm" 
+            />
           </button>
           {userOpen && (
             <div className="absolute right-0 mt-2 w-60 card shadow-elevated p-2 animate-fade-in-scale origin-top-right">

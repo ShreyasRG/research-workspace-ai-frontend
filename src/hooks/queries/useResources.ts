@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { resourceService } from '../../services';
-import { QUERY_KEYS } from '../../constants';
+import { QUERY_KEYS } from '@/constants/queryKeys';
+
 
 export function useResources(workspaceId?: string) {
   return useQuery({

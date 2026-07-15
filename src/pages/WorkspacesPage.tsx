@@ -10,8 +10,6 @@ import { ErrorState } from '../components/ui/ErrorState';
 import { CardGridSkeleton, ListSkeleton, IconGridSkeleton } from '../components/ui/Skeleton';
 import { useViewMode } from '../hooks/useViewMode';
 import { useToast } from '../contexts/ToastContext';
-import { WORKSPACE_COLORS, WORKSPACE_ICONS } from '../constants';
-import { cn } from '../utils';
 
 export function WorkspacesPage() {
   const { data: workspaces, isLoading, isError, refetch } = useWorkspaces();
@@ -20,16 +18,18 @@ export function WorkspacesPage() {
   const { viewMode, setViewMode } = useViewMode('workspaces');
   const [createOpen, setCreateOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const [newWs, setNewWs] = useState({ title: '', description: '', color: WORKSPACE_COLORS[0], icon: WORKSPACE_ICONS[0] });
+  const [newWs, setNewWs] = useState({ title: '', description: '' });
 
   const filtered = workspaces?.filter((w) => w.title.toLowerCase().includes(search.toLowerCase()) || w.description.toLowerCase().includes(search.toLowerCase())) ?? [];
 
   const handleCreate = async () => {
     if (!newWs.title.trim()) return;
-    const ws = await createWs.mutateAsync(newWs);
+    // Backend auto-assigns color/icon, but the mutation type requires them.
+    // Provide placeholder values so the call satisfies the expected shape.
+    const ws = await createWs.mutateAsync({ ...newWs, color: 'auto', icon: 'auto' });
     show({ type: 'success', title: 'Workspace created', message: ws.title });
     setCreateOpen(false);
-    setNewWs({ title: '', description: '', color: WORKSPACE_COLORS[0], icon: WORKSPACE_ICONS[0] });
+    setNewWs({ title: '', description: '' });
   };
 
   if (isError) return <ErrorState onRetry={() => refetch()} />;
@@ -57,7 +57,10 @@ export function WorkspacesPage() {
         <div className="space-y-3">
           <div><label className="block text-sm font-medium text-fg-default mb-1">Title</label><input className="input" placeholder="My new workspace" value={newWs.title} onChange={(e) => setNewWs({ ...newWs, title: e.target.value })} /></div>
           <div><label className="block text-sm font-medium text-fg-default mb-1">Description</label><textarea className="input min-h-[72px] resize-none" placeholder="What is this workspace about?" value={newWs.description} onChange={(e) => setNewWs({ ...newWs, description: e.target.value })} /></div>
-          <div><label className="block text-sm font-medium text-fg-default mb-1.5">Color</label><div className="flex flex-wrap gap-1.5">{WORKSPACE_COLORS.map((color) => <button key={color} onClick={() => setNewWs({ ...newWs, color })} className={cn('w-7 h-7 rounded-md transition-transform', newWs.color === color ? 'ring-2 ring-offset-1 ring-accent-fg scale-110' : 'hover:scale-105')} style={{ backgroundColor: color }} />)}</div></div>
+          {/* Color/icon are auto-assigned by the backend (see
+              CreateWorkspaceService) - no picker here, since letting the
+              user choose one that then gets silently overridden was the
+              exact bug we just fixed. */}
           <button className="btn-primary w-full" onClick={handleCreate} disabled={!newWs.title.trim() || createWs.isPending}>{createWs.isPending ? 'Creating…' : 'Create workspace'}</button>
         </div>
       </Modal>

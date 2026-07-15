@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { QUERY_KEYS } from '../../constants';
+import { QUERY_KEYS } from '@/constants/queryKeys'; // Specify the direct file name here
 import type { ProfilePreferences } from '../../types';
 
 export function useUpdateProfile() {

@@ -10,7 +10,7 @@ export const searchService = {
     for (const r of mockResources) {
       if (filters?.type?.length && !filters.type.includes(r.type)) continue;
       if (filters?.workspaceId && r.workspaceId !== filters.workspaceId) continue;
-      if (filters?.tag && !r.tags.some((t) => t.label === filters.tag)) continue;
+      if (filters?.tag && !r.tags.some((t) => t.name === filters.tag)) continue;
       if (!q) {
         results.push({
           id: r.id,
@@ -24,7 +24,7 @@ export const searchService = {
         });
         continue;
       }
-      const haystack = `${r.title} ${r.description} ${r.tags.map((t) => t.label).join(' ')} ${r.author}`.toLowerCase();
+      const haystack = `${r.title} ${r.description} ${r.tags.map((t) => t.name).join(' ')} ${r.author}`.toLowerCase();
       if (haystack.includes(q)) {
         results.push({
           id: r.id,
@@ -43,7 +43,7 @@ export const searchService = {
       if (filters?.type?.length && !filters.type.includes('summary')) continue;
       if (filters?.workspaceId && s.workspaceId !== filters.workspaceId) continue;
       if (!q) continue;
-      const haystack = `${s.title} ${s.summary} ${s.tags.map((t) => t.label).join(' ')}`.toLowerCase();
+      const haystack = `${s.title} ${s.summary} ${s.tags.map((t) => t.name).join(' ')}`.toLowerCase();
       if (haystack.includes(q)) {
         results.push({
           id: s.id,

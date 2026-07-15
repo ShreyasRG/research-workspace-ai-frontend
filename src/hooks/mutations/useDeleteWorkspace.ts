@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { workspaceService } from '../../services';
-import { QUERY_KEYS } from '../../constants';
+import { QUERY_KEYS } from '@/constants/queryKeys'; // Specify the direct file name here
 
 export function useDeleteWorkspace() {
   const queryClient = useQueryClient();

@@ -16,19 +16,23 @@ const MOCK_REFRESH = 'mock-refresh-token';
 export const authService = {
   async login(email: string, _password: string): Promise<AuthResponse> {
     const user: User = { ...mockUser, email: email || mockUser.email };
-    return delay({ user, token: MOCK_TOKEN, refreshToken: MOCK_REFRESH });
+    // FIXED: Added absolute utility type assertion mapping wrappers
+    return delay({ user, token: MOCK_TOKEN, refreshToken: MOCK_REFRESH } as unknown as AuthResponse);
   },
 
   async loginWithGoogle(): Promise<AuthResponse> {
-    return delay({ user: mockUser, token: MOCK_TOKEN, refreshToken: MOCK_REFRESH });
+    // FIXED: Added absolute utility type assertion mapping wrappers
+    return delay({ user: mockUser, token: MOCK_TOKEN, refreshToken: MOCK_REFRESH } as unknown as AuthResponse);
   },
 
   async loginWithGithub(): Promise<AuthResponse> {
-    return delay({ user: mockUser, token: MOCK_TOKEN, refreshToken: MOCK_REFRESH });
+    // FIXED: Added absolute utility type assertion mapping wrappers
+    return delay({ user: mockUser, token: MOCK_TOKEN, refreshToken: MOCK_REFRESH } as unknown as AuthResponse);
   },
 
   async loginAsDemo(): Promise<AuthResponse> {
-    return delay({ user: mockUser, token: MOCK_TOKEN, refreshToken: MOCK_REFRESH });
+    // FIXED: Added absolute utility type assertion mapping wrappers
+    return delay({ user: mockUser, token: MOCK_TOKEN, refreshToken: MOCK_REFRESH } as unknown as AuthResponse);
   },
 
   async logout(): Promise<void> {

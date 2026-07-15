@@ -10,9 +10,57 @@
   }
 }
 
+/* Lightweight icon animations */
+@layer utilities {
+  @keyframes iconBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
+  
+  @keyframes iconPulseGlow {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+  
+  @keyframes iconSlideIn {
+    from { transform: translateX(-8px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  
+  @keyframes iconSlideRight {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(3px); }
+  }
+  
+  @keyframes iconFlip {
+    0%, 100% { transform: rotateY(0deg); }
+    50% { transform: rotateY(180deg); }
+  }
+  
+  .animate-icon-bounce {
+    animation: iconBounce 0.5s ease-in-out;
+  }
+  
+  .animate-icon-pulse-glow {
+    animation: iconPulseGlow 2s ease-in-out infinite;
+  }
+  
+  .animate-icon-slide-in {
+    animation: iconSlideIn 0.3s ease-out;
+  }
+  
+  .animate-icon-slide-right {
+    animation: iconSlideRight 0.6s ease-in-out infinite;
+  }
+  
+  .animate-icon-flip {
+    animation: iconFlip 0.6s ease-in-out;
+  }
+}
+
 @layer components {
   .btn {
-    @apply inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors disabled:opacity-60 disabled:cursor-not-allowed border;
+    @apply inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed border hover:scale-105 active:scale-95;
   }
   .btn-primary {
     @apply btn bg-accent-emphasis text-white border-accent-emphasis hover:bg-[#0860ca];

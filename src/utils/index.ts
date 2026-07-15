@@ -25,3 +25,6 @@ export function statusLabel(status: string): string {
   const map: Record<string, string> = { unread: 'Unread', reading: 'Reading', completed: 'Completed', archived: 'Archived' };
   return map[status] ?? status;
 }
+
+// Icon animation utilities
+export { getIconAnimationClass } from './animations';

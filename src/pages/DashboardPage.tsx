@@ -1,18 +1,34 @@
 import { Link } from 'react-router-dom';
-import { FolderTree, Sparkles, FileText, Flame, Clock } from 'lucide-react';
+import { FolderTree, Sparkles, FileText, Flame, Clock, Plus } from 'lucide-react';
+import { useState } from 'react';
 import { useWorkspaces, useSummaries, useResources, useProfile } from '../hooks/queries';
+import { useCreateWorkspace } from '../hooks/mutations';
 import { WorkspaceCard } from '../components/WorkspaceCard';
 import { AISummaryCard } from '../components/AISummaryCard';
 import { CardGridSkeleton } from '../components/ui/Skeleton';
+import { Modal } from '../components/ui/Modal';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
 import { formatDate, cn } from '../utils';
 
 export function DashboardPage() {
   const { user } = useAuth();
+  const { show } = useToast();
   const { data: workspaces, isLoading: wsLoading } = useWorkspaces();
   const { data: summaries, isLoading: sumLoading } = useSummaries();
   const { data: resources } = useResources();
   const { data: profile } = useProfile();
+  const createWs = useCreateWorkspace();
+  const [createOpen, setCreateOpen] = useState(false);
+  const [newWs, setNewWs] = useState({ title: '', description: '' });
+
+  const handleCreate = async () => {
+    if (!newWs.title.trim()) return;
+    const ws = await createWs.mutateAsync({ ...newWs, color: 'auto', icon: 'auto' });
+    show({ type: 'success', title: 'Workspace created', message: ws.title });
+    setCreateOpen(false);
+    setNewWs({ title: '', description: '' });
+  };
 
   return (
     <div className="p-4 lg:p-6 max-w-6xl mx-auto">
@@ -29,9 +45,12 @@ export function DashboardPage() {
       <section className="mb-6">
         <div className="flex items-center justify-between mb-3">
           <h2 className="section-heading">Recent workspaces</h2>
-          <Link to="/workspaces" className="text-sm text-accent-fg hover:underline">View all</Link>
+          <div className="flex items-center gap-2">
+            <button onClick={() => setCreateOpen(true)} className="btn-secondary btn-sm"><Plus className="w-3.5 h-3.5" />Create</button>
+            <Link to="/workspaces" className="btn-secondary btn-sm">View all</Link>
+          </div>
         </div>
-        {wsLoading ? <CardGridSkeleton count={3} /> : <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">{workspaces?.slice(0, 3).map((ws) => <WorkspaceCard key={ws.id} workspace={ws} viewMode="gallery" />)}</div>}
+        {wsLoading ? <CardGridSkeleton count={3} /> : <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">{workspaces?.slice(0, 3).map((ws) => <div key={ws.id} className="h-full"><WorkspaceCard workspace={ws} viewMode="gallery" /></div>)}</div>}
       </section>
       <section className="mb-6">
         <h2 className="section-heading mb-3">Recent resources</h2>
@@ -48,10 +67,17 @@ export function DashboardPage() {
       <section>
         <div className="flex items-center justify-between mb-3">
           <h2 className="section-heading">Recent AI summaries</h2>
-          <Link to="/summaries" className="text-sm text-accent-fg hover:underline">View all</Link>
+          <Link to="/summaries" className="btn-secondary btn-sm">View all</Link>
         </div>
         {sumLoading ? <CardGridSkeleton count={3} /> : <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">{summaries?.slice(0, 3).map((s) => <AISummaryCard key={s.id} summary={s} />)}</div>}
       </section>
+      <Modal open={createOpen} onClose={() => setCreateOpen(false)} title="Create workspace" size="md">
+        <div className="space-y-3">
+          <div><label className="block text-sm font-medium text-fg-default mb-1">Title</label><input className="input" placeholder="My new workspace" value={newWs.title} onChange={(e) => setNewWs({ ...newWs, title: e.target.value })} /></div>
+          <div><label className="block text-sm font-medium text-fg-default mb-1">Description</label><textarea className="input min-h-[72px] resize-none" placeholder="What is this workspace about?" value={newWs.description} onChange={(e) => setNewWs({ ...newWs, description: e.target.value })} /></div>
+          <button className="btn-primary w-full" onClick={handleCreate} disabled={!newWs.title.trim() || createWs.isPending}>{createWs.isPending ? 'Creating…' : 'Create workspace'}</button>
+        </div>
+      </Modal>
     </div>
   );
 }

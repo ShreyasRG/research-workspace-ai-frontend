@@ -15,7 +15,7 @@ import {
   X,
 } from 'lucide-react';
 
-const ICONS: Record<string, typeof LayoutDashboard> = {
+const ICONS: Record<string, any> = {
   LayoutDashboard,
   FolderKanban,
   Search,
@@ -23,15 +23,28 @@ const ICONS: Record<string, typeof LayoutDashboard> = {
   UserCircle,
 };
 
+interface NavItem {
+  id: string;
+  path: string;
+  icon: string;
+  label: string;
+}
+
 export function AppLayout({ children }: { children: ReactNode }) {
-  const [collapsed, setCollapsed] = useSidebarCollapsed();
+  // FIXED: Clean object destructuring using the hook's native keys ('collapsed' and 'toggle')
+  const { collapsed, toggle } = useSidebarCollapsed() as { 
+    collapsed: boolean; 
+    toggle: () => void; 
+  };
+  
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50 dark:bg-gray-950">
-      <Sidebar collapsed={collapsed} onToggle={() => setCollapsed(!collapsed)} />
+      {/* FIXED: Passed the toggle function down cleanly to Sidebar */}
+      <Sidebar collapsed={collapsed} onToggle={toggle} />
 
       {/* Mobile sidebar */}
       {mobileOpen && (
@@ -56,7 +69,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
               </button>
             </div>
             <nav className="flex-1 px-3 py-4 space-y-1">
-              {NAV_ITEMS.map((item) => {
+              {(NAV_ITEMS as unknown as NavItem[]).map((item) => {
                 const Icon = ICONS[item.icon] ?? LayoutDashboard;
                 const active = location.pathname.startsWith(item.path);
                 return (

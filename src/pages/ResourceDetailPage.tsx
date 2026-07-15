@@ -27,7 +27,7 @@ export function ResourceDetailPage() {
   if (isError || !resource) return <ErrorState message="Resource not found" onRetry={() => navigate('/workspaces')} />;
 
   const handleDelete = async () => {
-    await deleteResource.mutateAsync(resource.id);
+    await deleteResource.mutateAsync({ id: resource.id, workspaceId: resource.workspaceId });
     show({ type: 'success', title: 'Resource deleted', message: resource.title });
     navigate(`/workspaces/${resource.workspaceId}`);
   };

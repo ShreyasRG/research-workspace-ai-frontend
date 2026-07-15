@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { workspaceService, resourceService, summaryService } from '../../services';
-import { QUERY_KEYS } from '../../constants';
+import { QUERY_KEYS } from '@/constants/queryKeys'; // Specify the direct file name here
 
 export interface DashboardData {
   workspaces: Awaited<ReturnType<typeof workspaceService.getWorkspaces>>;

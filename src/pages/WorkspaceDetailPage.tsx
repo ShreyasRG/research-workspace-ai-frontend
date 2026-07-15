@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, Plus, Calendar, Users, ExternalLink, ScanLine, FileText, Video, StickyNote } from 'lucide-react';
+import { ArrowLeft, Plus, Calendar, Users, ExternalLink, ScanLine, FileText, Video, StickyNote, Trash2 } from 'lucide-react';
 import { useWorkspace, useResources } from '../hooks/queries';
-import { useAddResource, useDeleteResource } from '../hooks/mutations';
+import { useAddResource, useDeleteResource, useDeleteWorkspace } from '../hooks/mutations';
 import type { ResourceType, Resource, ScannedDocument } from '../types';
 import { ResourceCard } from '../components/ResourceCard';
 import { ViewToggle } from '../components/ViewToggle';
 import { QuickLookModal } from '../components/QuickLookModal';
 import { Avatar } from '../components/ui/Avatar';
 import { Modal } from '../components/ui/Modal';
+import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 import { DocumentScannerModal } from '../components/DocumentScannerModal';
 import { EmptyState } from '../components/ui/EmptyState';
 import { ErrorState } from '../components/ui/ErrorState';
@@ -16,6 +17,7 @@ import { CardGridSkeleton, ListSkeleton, IconGridSkeleton } from '../components/
 import { useViewMode } from '../hooks/useViewMode';
 import { useToast } from '../contexts/ToastContext';
 import { formatDate, cn } from '../utils';
+import { ROUTES } from '../constants';
 
 const TYPE_OPTIONS: { value: ResourceType; label: string; icon: typeof FileText }[] = [
   { value: 'article', label: 'Article', icon: FileText }, { value: 'video', label: 'Video', icon: Video }, { value: 'note', label: 'Note', icon: StickyNote },
@@ -28,10 +30,12 @@ export function WorkspaceDetailPage() {
   const { data: resources, isLoading: resLoading } = useResources(id);
   const addResource = useAddResource();
   const deleteResource = useDeleteResource();
+  const deleteWorkspace = useDeleteWorkspace();
   const { show } = useToast();
   const { viewMode, setViewMode } = useViewMode('resources');
   const [addOpen, setAddOpen] = useState(false);
   const [scannerOpen, setScannerOpen] = useState(false);
+  const [deleteWorkspaceOpen, setDeleteWorkspaceOpen] = useState(false);
   const [quickLookResource, setQuickLookResource] = useState<Resource | null>(null);
   const [newRes, setNewRes] = useState({ title: '', type: 'article' as ResourceType, sourceUrl: '' });
 
@@ -49,8 +53,20 @@ export function WorkspaceDetailPage() {
   };
 
   const handleDelete = async (resource: Resource) => {
-    await deleteResource.mutateAsync(resource.id);
+    if (!id) return;
+    await deleteResource.mutateAsync({ id: resource.id, workspaceId: id });
     show({ type: 'success', title: 'Resource deleted', message: resource.title });
+  };
+
+  const handleDeleteWorkspace = async () => {
+    if (!id) return;
+    try {
+      await deleteWorkspace.mutateAsync(id);
+      show({ type: 'success', title: 'Workspace deleted' });
+      navigate(ROUTES.WORKSPACES);
+    } catch {
+      show({ type: 'error', title: 'Failed to delete workspace' });
+    }
   };
 
   if (wsError) return <ErrorState message="Workspace not found" onRetry={() => navigate('/workspaces')} />;
@@ -67,7 +83,16 @@ export function WorkspaceDetailPage() {
               <p className="text-sm text-fg-muted mt-0.5">{workspace.description}</p>
               <div className="flex items-center gap-3 mt-2 text-xs text-fg-subtle"><span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{formatDate(workspace.createdAt)}</span><span className="flex items-center gap-1"><Users className="w-3 h-3" />{workspace.members.length} members</span></div>
             </div>
-            <div className="flex -space-x-1.5">{workspace.members.slice(0, 4).map((m) => <Avatar key={m.id} src={m.avatarUrl} alt={m.name} size="sm" className="ring-1 ring-canvas-default" />)}</div>
+            <div className="flex items-center gap-2">
+              <div className="flex -space-x-1.5">{workspace.members.slice(0, 4).map((m) => <Avatar key={m.id} src={m.avatarUrl} alt={m.name} size="sm" className="ring-1 ring-canvas-default" />)}</div>
+              <button
+                onClick={() => setDeleteWorkspaceOpen(true)}
+                title="Delete workspace"
+                className="p-2 rounded-md border border-border-default text-fg-subtle hover:text-danger-fg hover:border-danger-fg hover:scale-110 active:scale-95 transition-all duration-200"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
       ) : null}
@@ -96,6 +121,14 @@ export function WorkspaceDetailPage() {
       </Modal>
       <DocumentScannerModal open={scannerOpen} onClose={() => setScannerOpen(false)} onScanComplete={handleScanComplete} />
       <QuickLookModal resource={quickLookResource} onClose={() => setQuickLookResource(null)} />
+      <ConfirmDialog
+        open={deleteWorkspaceOpen}
+        onClose={() => setDeleteWorkspaceOpen(false)}
+        onConfirm={handleDeleteWorkspace}
+        title="Delete workspace?"
+        message={`"${workspace?.title}" and all its resources will be permanently deleted. This action cannot be undone.`}
+        confirmLabel="Delete"
+      />
     </div>
   );
 }

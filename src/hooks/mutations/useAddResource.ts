@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { resourceService } from '../../services';
-import { QUERY_KEYS } from '../../constants';
+import { QUERY_KEYS } from '@/constants/queryKeys'; // Specify the direct file name here
 import type { ResourceType } from '../../types';
 
 export function useAddResource() {

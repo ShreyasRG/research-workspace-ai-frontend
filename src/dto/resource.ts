@@ -1,3 +1,10 @@
+export interface AddResourceRequestDTO {
+  title: string;
+  type: string;
+  sourceUrl?: string;
+  description?: string;
+}
+
 export interface ResourceResponseDTO {
   id: string;
   workspaceId: string;

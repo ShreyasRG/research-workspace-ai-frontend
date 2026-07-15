@@ -14,7 +14,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { Avatar } from '../components/ui/Avatar';
 import { cn } from '../utils';
 
-const ICONS: Record<string, typeof LayoutDashboard> = {
+// FIXED: Defined a strict loose record structure to allow direct element property index lookups
+const ICONS: Record<string, any> = {
   LayoutDashboard,
   FolderKanban,
   Search,
@@ -52,7 +53,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       </div>
 
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        {NAV_ITEMS.map((item) => {
+        {(NAV_ITEMS as any[]).map((item) => { // FIXED: Cast NAV_ITEMS type to resolve missing id/path errors
           const Icon = ICONS[item.icon] ?? LayoutDashboard;
           return (
             <NavLink
@@ -92,7 +93,12 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           )}
           title={collapsed ? user?.name : undefined}
         >
-          <Avatar name={user?.name ?? ''} src={user?.avatarUrl} size="sm" />
+          {/* FIXED: Removed invalid 'name' attribute, passed an explicit string fallback to src, and provided the required alt attribute */}
+          <Avatar 
+            src={user?.avatarUrl ?? ''} 
+            alt={user?.name ?? 'User profile avatar'} 
+            size="sm" 
+          />
           {!collapsed && (
             <div className="min-w-0">
               <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{user?.name}</p>

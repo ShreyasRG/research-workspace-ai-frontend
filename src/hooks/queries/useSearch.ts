@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { searchService, workspaceService } from '../../services';
-import { QUERY_KEYS } from '../../constants';
+
 import type { SearchFilters } from '../../types';
 import { useDebounce } from '../useDebounce';
+import { QUERY_KEYS } from '@/constants/queryKeys';
 
 export function useSearch(query: string, filters?: SearchFilters) {
   const debouncedQuery = useDebounce(query, 350);

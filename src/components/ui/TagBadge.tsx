@@ -1,5 +1,4 @@
 import type { Tag } from '../../types';
-import { TAG_COLORS } from '../../constants';
 import { cn } from '../../utils';
 
 interface TagBadgeProps {
@@ -9,8 +8,8 @@ interface TagBadgeProps {
 
 export function TagBadge({ tag, className }: TagBadgeProps) {
   return (
-    <span className={cn('badge', TAG_COLORS[tag.color] ?? TAG_COLORS.blue, className)}>
-      {tag.label}
+    <span className={cn('label-neutral hover:scale-105 transition-transform duration-200 cursor-default', className)}>
+      {tag.name}
     </span>
   );
 }
